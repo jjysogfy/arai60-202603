@@ -8,7 +8,7 @@
   - https://docs.oracle.com/javase/jp/8/docs/api/java/util/Map.html
 
 ```java
-// Step 1
+// step 1
 class Solution {
   public boolean isValid(String s) {
     Map<Character, Character> brackets = new HashMap<>();
@@ -65,7 +65,7 @@ Javaで解いている人のコードを主に見てみる。
   - `closeToOpen`
 - `Map.of` というのが便利そう
   - https://docs.oracle.com/javase/jp/25/docs/api/java.base/java/util/Map.html#unmodifiable
-  - （これまで見ていたdocumentationは、よく見ると古いバージョンだった。そのせいで `Map.of` が書いていなかった。バージョン9で追加された機能だった。新しいバージョンを見たらあった。なお今年のバージョン26は[出たばかり](https://blogs.oracle.com/java/the-arrival-of-java-26)なので、一つ前の[25](https://docs.oracle.com/javase/jp/25/docs/api/index.html)を参照した。）
+  - （これまで見ていたdocumentationは、よく見ると古いバージョンだった。そのせいで `Map.of` が書いていなかった。バージョン9で追加された機能だった。新しいバージョンを見たらあった。なお今年のバージョン26は[出たばかり](https://blogs.oracle.com/java/the-arrival-of-java-26)のせいか日本語訳がなく、一つ前の[25](https://docs.oracle.com/javase/jp/25/docs/api/index.html)を参照した。）
 - `openToClose` を使う人もいる（`closeToOpen` ではなく）
   - たとえば https://github.com/ryoooooory/LeetCode/pull/13/changes#diff-f9961ace8ead467d6aeebc53b241da26a31ee32d345d85fcd0c2c6b7b3c1c609
   - かっこ以外の文字が来たときの振る舞いも、自分のコードとは違う
@@ -77,7 +77,9 @@ Javaで解いている人のコードを主に見てみる。
   - 確かに、ドキュメントを見ると `char[]` が使われている https://docs.oracle.com/javase/jp/25/docs/api/java.base/java/net/PasswordAuthentication.html
 - スタックに閉じかっこ `)` を積むという考えもある
   - https://github.com/philip82148/leetcode-swejp/pull/11#discussion_r2057085868
-  - 違いはあるか？ 対応する「閉じかっこ」が複数ある文法（そんなものがあるとして）だと、この方法ではやりづらいとは思った
+  - `c` が閉じかっこのときの処理で考えることが減り、見やすい気がする
+  - 悪い点はなにか？ （シビアな）計算時間の問題が指摘されている。一つの開きかっこに「閉じかっこ」が複数種類がある文法（そんなものがあるとして）だと、この方法ではやりづらいとは思った
+- `openToClose` をconstにしている人もいる
 
 
 コメント集も見る。
@@ -94,27 +96,31 @@ Javaで解いている人のコードを主に見てみる。
 
 # step 2.2 : 清書する
 ```java
+// step 2
 import java.util.Map;
 import java.util.ArrayDeque;
 
 class Solution {
   public boolean isValid(String s) {
-    final char DUMMY = '\0';
-    Map<Character, Character> openToClose = Map.of('(', ')', '{', '}', '[', ']', DUMMY, DUMMY);
-    var openBracketStack = new ArrayDeque<Character>();
-    openBracketStack.push(DUMMY);
+    final Map<Character, Character> openToClose = Map.of('(', ')', '{', '}', '[', ']');
+    var closeBracketStack = new ArrayDeque<Character>();
 
     for (char c : s.toCharArray()) {
       if (openToClose.containsKey(c)) {
-        openBracketStack.push(c);
+        var closeBracket = openToClose.get(c);
+        closeBracketStack.push(closeBracket);
         continue;
       }
-      char top = openBracketStack.pop();
-      if (openToClose.get(top) != c) {
+
+      if (closeBracketStack.isEmpty()) {
+        return false;
+      }
+      char top = closeBracketStack.pop();
+      if (top != c) {
         return false;
       }
     }
-    return openBracketStack.size() == 1;
+    return closeBracketStack.isEmpty();
   }
 }
 ```
@@ -122,6 +128,36 @@ class Solution {
 変更点
 - LeetCodeでは不要のようだが、`import`文を書いておいた
 - `openToClose` （`closeToOpen` ではなく）を使う
-- 番兵を使ってみた
-- （かっこ以外の文字がある場合は、`return false` とした。ここは変更なし）
+- （変更しなかったところ：かっこ以外の文字がある場合は `return false`）
 
+
+# step 3 : 3回書けるようになる
+```java
+// step 3
+class Solution {
+  public boolean isValid(String s) {
+    final var openToClose = Map.of('(', ')', '{', '}', '[', ']');
+    var closeBracketStack = new ArrayDeque<Character>();
+
+    for (char c : s.toCharArray()) {
+      if (openToClose.containsKey(c)) {
+        closeBracketStack.push(openToClose.get(c));
+        continue;
+      }
+
+      if (closeBracketStack.isEmpty()) {
+        return false;
+      }
+      var top = closeBracketStack.pop();
+      if (top != c) {
+        return false;
+      }
+    }
+    return closeBracketStack.isEmpty();
+  }
+}
+```
+
+- 5回ぐらい書いた。1回2分ぐらいで書けるようになった。
+- ちゃんと計っていないが、全体で4、5時間かかっている気がする。
+  - このファイル（`20-Valid-Parentheses.md`）を書くのにも時間がかかっていると思う。余計なことを書いていそう？
