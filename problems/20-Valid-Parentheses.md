@@ -45,7 +45,7 @@ class Solution {
 - Javaのこともよくわからない
   - `HashMap` の初期化はもっと簡単にならないかと思った。double-brace initializationというものを使えると言っている人がいる（ https://stackoverflow.com/questions/6833925/better-map-constructor ）。しかし、上のコードと違い anonymous inner class を作ると書いてある。
   - よく理解できていないが、とりあえずは上の単純なコードで十分そうだと感じたので、調べるのも一旦やめる
-- `s.toCharArray()` してfor文を使っているが、このあたりの文字列の扱いはちょっと怖い感じがした（もちろん今回の設定では問題ないが）
+- `s.toCharArray()` してfor文を使っているが、Unicode文字列の扱いはちょっと怖い感じがした（もちろん今回の設定では問題ないが）
 
 
 # step 2.1 : コードを読む
@@ -70,7 +70,14 @@ Javaで解いている人のコードを主に見てみる。
   - たとえば https://github.com/ryoooooory/LeetCode/pull/13/changes#diff-f9961ace8ead467d6aeebc53b241da26a31ee32d345d85fcd0c2c6b7b3c1c609
   - かっこ以外の文字が来たときの振る舞いも、自分のコードとは違う
   - かっこ以外の文字が来るとその時点で `return false` になる。自分のコードでは、かっこ以外の文字もまずはスタックに積んで実行を続け、あとから `return false` する
-- 特に step 1 で、`switch` を使った人もいる
+- `switch` 文を使った人もいる（特に step 1）
+- Javaでの文字列について書いている人もいる
+  - https://github.com/HitoshiKoba/Arai60-public/pull/2/changes/BASE..8c5b480e383a45d3c8e4e750eb214d7adad253ef#diff-7f1d09185c5788a4021637266180cd9c8b3a1cf8fda54c5f8a53331a71c45861
+  - `char[]` はパスワード処理に使われると書いてある
+  - 確かに、ドキュメントを見ると `char[]` が使われている https://docs.oracle.com/javase/jp/25/docs/api/java.base/java/net/PasswordAuthentication.html
+- スタックに閉じかっこ `)` を積むという考えもある
+  - https://github.com/philip82148/leetcode-swejp/pull/11#discussion_r2057085868
+  - 違いはあるか？ 対応する「閉じかっこ」が複数ある文法（そんなものがあるとして）だと、この方法ではやりづらいとは思った
 
 
 コメント集も見る。
@@ -84,5 +91,37 @@ Javaで解いている人のコードを主に見てみる。
 
 ここまで3時間ぐらいかかっていると思う。先に進む。
 
+
 # step 2.2 : 清書する
+```java
+import java.util.Map;
+import java.util.ArrayDeque;
+
+class Solution {
+  public boolean isValid(String s) {
+    final char DUMMY = '\0';
+    Map<Character, Character> openToClose = Map.of('(', ')', '{', '}', '[', ']', DUMMY, DUMMY);
+    var openBracketStack = new ArrayDeque<Character>();
+    openBracketStack.push(DUMMY);
+
+    for (char c : s.toCharArray()) {
+      if (openToClose.containsKey(c)) {
+        openBracketStack.push(c);
+        continue;
+      }
+      char top = openBracketStack.pop();
+      if (openToClose.get(top) != c) {
+        return false;
+      }
+    }
+    return openBracketStack.size() == 1;
+  }
+}
+```
+
+変更点
+- LeetCodeでは不要のようだが、`import`文を書いておいた
+- `openToClose` （`closeToOpen` ではなく）を使う
+- 番兵を使ってみた
+- （かっこ以外の文字がある場合は、`return false` とした。ここは変更なし）
 
