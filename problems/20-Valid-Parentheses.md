@@ -69,7 +69,7 @@ Javaで解いている人のコードを主に見てみる。
 - `openToClose` を使う人もいる（`closeToOpen` ではなく）
   - たとえば https://github.com/ryoooooory/LeetCode/pull/13/changes#diff-f9961ace8ead467d6aeebc53b241da26a31ee32d345d85fcd0c2c6b7b3c1c609
   - かっこ以外の文字が来たときの振る舞いも、自分のコードとは違う
-  - かっこ以外の文字が来るとその時点で `return false` になる。自分のコードでは、かっこ以外の文字もまずはスタックに積んで実行を続け、あとから `return false` する
+  - かっこ以外の文字を読んだらすぐ `return false` している。自分のコードでは、まずはかっこ以外の文字もスタックに積んで実行を続け、あとから `return false` する
 - `switch` 文を使った人もいる（特に step 1）
 - Javaでの文字列について書いている人もいる
   - https://github.com/HitoshiKoba/Arai60-public/pull/2/changes/BASE..8c5b480e383a45d3c8e4e750eb214d7adad253ef#diff-7f1d09185c5788a4021637266180cd9c8b3a1cf8fda54c5f8a53331a71c45861
@@ -161,3 +161,4 @@ class Solution {
 - 5回ぐらい書いた。1回2分ぐらいで書けるようになった。
 - ちゃんと計っていないが、全体で4、5時間かかっている気がする。
   - このファイル（`20-Valid-Parentheses.md`）を書くのにも時間がかかっていると思う。余計なことを書いていそう？
+- 見直していて思ったが `var top = closeBracketStack.pop();` の `var` は危うい。`Character` どうしの `==` は意図したものにならないので
