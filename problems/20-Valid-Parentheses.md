@@ -39,8 +39,8 @@ class Solution {
 この段階で考えたこと。
 - 詰まりながら20分ぐらいかけて書いた
   - Javaの使い方もそうだが、アルゴリズムの部分も迷った
-  - 全体をよく考えず書きはじめてしまったので、`brackets.containsKey(c)` の場合を先に処理していたところ、途中で `!brackets.containsKey(c)` のほうを先に処理するよう書き直した。
-  - そのせいで無駄な `continue` が残っている……
+  - 全体をよく考えず書きはじめてしまってから、途中で書き換えたせいで、無駄な `continue` が残っている……
+  - （解き始める前に、どの問題を解くか選んだり、調べごとをしたりもしていたので、そういう時間を含めればもっとたくさん時間がかかっている）
 - 変数名はあまりよくないかもしれない。とくに `stack` は適当すぎるかも
 - Javaのこともよくわからない
   - `HashMap` の初期化はもっと簡単にならないかと思った。double-brace initializationというものを使えると言っている人がいる（ https://stackoverflow.com/questions/6833925/better-map-constructor ）。しかし、上のコードと違い anonymous inner class を作ると書いてある。
@@ -48,14 +48,15 @@ class Solution {
 - `s.toCharArray()` してfor文を使っているが、このあたりの文字列の扱いはちょっと怖い感じがした（もちろん今回の設定では問題ないが）
 
 
-# step 2 : コードを読む・清書する
-ここまでで1時間ぐらいはかかっている。
+# step 2.1 : コードを読む
+解き始めてから1時間ぐらいはかかっている。調べごとをしたり、このファイルを書いたりでいつの間にか時間がかかってしまった。
+
 Javaで解いている人のコードを主に見てみる。
 
 - https://github.com/goto-untrapped/Arai60/pull/10/changes
 - https://github.com/ryoooooory/LeetCode/pull/13/changes
 
-- この問題は文脈自由文法で捉えられる、ということを連想するとのこと
+- この問題を見ると、文脈自由文法を連想するとのこと
 - 便利なコレクションが他にもある
   - `Stack`, `ArrayDeque`
   - https://docs.oracle.com/javase/jp/8/docs/api/java/util/Stack.html
@@ -64,5 +65,24 @@ Javaで解いている人のコードを主に見てみる。
   - `closeToOpen`
 - `Map.of` というのが便利そう
   - https://docs.oracle.com/javase/jp/25/docs/api/java.base/java/util/Map.html#unmodifiable
-  - これまで見ていたdocumentationは、よく見ると古いバージョンだった。そのせいで `Map.of` が書いていなかった。新しいバージョンを見たらあった。
-  - https://www.oracle.com/jp/java/technologies/documentation.html 日本語訳のあるのはバージョン25が最新版らしい。
+  - （これまで見ていたdocumentationは、よく見ると古いバージョンだった。そのせいで `Map.of` が書いていなかった。バージョン9で追加された機能だった。新しいバージョンを見たらあった。なお今年のバージョン26は[出たばかり](https://blogs.oracle.com/java/the-arrival-of-java-26)なので、一つ前の[25](https://docs.oracle.com/javase/jp/25/docs/api/index.html)を参照した。）
+- `openToClose` を使う人もいる（`closeToOpen` ではなく）
+  - たとえば https://github.com/ryoooooory/LeetCode/pull/13/changes#diff-f9961ace8ead467d6aeebc53b241da26a31ee32d345d85fcd0c2c6b7b3c1c609
+  - かっこ以外の文字が来たときの振る舞いも、自分のコードとは違う
+  - かっこ以外の文字が来るとその時点で `return false` になる。自分のコードでは、かっこ以外の文字もまずはスタックに積んで実行を続け、あとから `return false` する
+- 特に step 1 で、`switch` を使った人もいる
+
+
+コメント集も見る。
+- 番兵を使うと、`stack.isEmpty()` が不要に https://github.com/SanakoMeine/leetcode/pull/7
+- かっこ以外の文字をどうするか https://discord.com/channels/1084280443945353267/1225849404037009609/1231648833914802267
+  - 自分のコードは、かっこ以外の文字が来たとき、`false` になる
+  - しかし、確かに、かっこ以外の文字は読み飛ばすほうが便利なことが多いかも
+- 例外を投げることについて https://github.com/mura0086/arai60/pull/11
+  - 誰かがコードを書き換えたときを想像している。なるほど。経験がないのでピンとは来ないけど
+- 進め方について https://github.com/HitoshiKoba/Arai60-public/pull/2
+
+ここまで3時間ぐらいかかっていると思う。先に進む。
+
+# step 2.2 : 清書する
+
