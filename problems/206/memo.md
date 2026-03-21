@@ -55,13 +55,13 @@ class Solution {
   - `head.next` を普通にreverseすると、`ListNode` の末尾に付け加える必要が出てきてやりづらい。そこで、「末尾に付け加えるリスト」も引数に入れたヘルパー関数を作れば[よい](https://github.com/goto-untrapped/Arai60/pull/27/changes#diff-0f2410aa19c752486fd39f11faebbe287a36b9dc9016dd3c6c1e0531259b409aR55)
   - 参照をうまく使って（という言い方でいいのか？）処理する人も[いる](https://github.com/goto-untrapped/Arai60/pull/27/changes#diff-0f2410aa19c752486fd39f11faebbe287a36b9dc9016dd3c6c1e0531259b409aR40)。`head.next` をreverseすると、その末尾は `head.next` と表せる
     - `var newTail = head.next` とか、名前があったほうが見やすい気がする。読むのにちょっと悩んだ
-- 再帰をスタックとループに書き直す人も[いる](https://github.com/goto-untrapped/Arai60/pull/27/changes#diff-0f2410aa19c752486fd39f11faebbe287a36b9dc9016dd3c6c1e0531259b409aR65)
-  - 追記：よく見たら、スタックを使うというだけで、再帰の書き換えとは言っていなかった
-
-ここまで40分ぐらい。
+- スタックで書く方法も[ある](https://github.com/goto-untrapped/Arai60/pull/27/changes#diff-0f2410aa19c752486fd39f11faebbe287a36b9dc9016dd3c6c1e0531259b409aR65)
+  - 前から順にスタックに積むと、積まれ方はすでに逆順になっている。スタックから取り出しながら、`.next` を書き換える。
+  - 「後ろからループ」できるならreverseは簡単なはずで、そのために一度リストをスタックに取り出す、という感じか
 
 goto-untrapped氏のレビューを見る。
 - 再帰について、組を返すという考えもある https://github.com/goto-untrapped/Arai60/pull/27#discussion_r1641596128
+  - （上の「参照をうまく使」う方法で、`head.next` と参照するかわりに返り値に含めてしまう、という感じ）
   - Javaでどうやって組を返すのか気になった
   - ChatGPTに訊いたら、クラスを作るか `record` を使うとのこと。
   - `record` はJava 16からの機能だそうだ（[「This JEP proposes to finalize the feature in JDK 16」](https://openjdk.org/jeps/395)）。
@@ -78,10 +78,45 @@ public static Result calculate(int a, int b) {
 }
 ```
 
-ここまで65分ぐらい。
+ryoooooory氏の[コード](https://github.com/ryoooooory/LeetCode/pull/14)も見る。
+- FirstSolution.java, L4: 自分が変数名 `target_node` としたものを `prev` と呼んでいる。気持ちがよくわかっていないが、処理済みだから、ということ？
+  - 少しわかってきた。`prev = current` として次のループに行くので、確かに `prev` という感じがする。では何が難しいと感じたかというと、自分としては、変数の指すものとして、各ノードというよりリスト全体に意識が向いていたからだと思った。
+- FirstSolution.java, L15: スタックを使う方法。さっきと少し違って混乱した。空リストについて、先程は番兵で処理していたが、今回ははじめに `return null` して処理している。
+- [ifのdanglingについて](https://github.com/ryoooooory/LeetCode/pull/14#discussion_r1657558481)
+  - どうでもいいことだが、「{}を省略すること」の「ぶらさがり」感がピンときていない
+  - https://en.wikipedia.org/wiki/Dangling_else パース結果が一つに決まらなくなるので、どのifに対するelseなのか「ぶらぶらする」、ぐらい？
+- [else ifを避けるとき](https://github.com/ryoooooory/LeetCode/pull/14#discussion_r1653787365)
+  - 気にしていなかった。そういう考えもあるのか
+
+ここまで2時間ちょっとかかった。
+
+コメント集も軽く見ておく。
+- `prev` という変数名はパズルになってしまっているという意見が[ある](https://discord.com/channels/1084280443945353267/1307605446538039337/1315556530837262366)。自分も読んでいて迷ったのだった
+- スタックを使う方法で、番兵を使うかなどのバリエーションがあること https://discord.com/channels/1084280443945353267/1318201011722129459/1338003562143420547
+  - 上述のryoooooory氏のコードは、「ループの外に出す」方法か
+- [ひっくり返し方が3種類あるという話](https://discord.com/channels/1084280443945353267/1350090869390311494/1355838883325022278)
+  - 読んでしばらく考えていた。よくわからなくなってきた。あとでもう少し考える
 
 
 # step 2.2 : 清書する
+```java
+class Solution {
+  public ListNode reverseList(ListNode head) {
+    ListNode rest = head;
+    ListNode reversed = null;
+
+    while (rest != null) {
+      var newHead = rest;
+      rest = rest.next;
+      newHead.next = reversed;
+      reversed = newHead;
+    }
+    return reversed;
+  }
+}
+```
+
+ここまで、3時間半ぐらい。
 
 
 # step 3 : 3回書けるようになる
