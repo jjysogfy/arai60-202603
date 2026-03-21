@@ -83,7 +83,7 @@ public static Result calculate(int a, int b) {
 ryoooooory氏の[コード](https://github.com/ryoooooory/LeetCode/pull/14)も見る。
 - FirstSolution.java, L4: 自分が変数名 `target_node` としたものを `prev` と呼んでいる。気持ちがよくわかっていないが、処理済みだから、ということ？
   - 少しわかってきた。`prev = current` としてから次のループに行くので、確かに `prev` という感じがする。では、なぜ初めわからなかったかというと、自分としては、変数の指すものとして、各ノードというよりリスト全体に意識が向いていたからだと思った。
-- FirstSolution.java, L15: スタックを使う方法。さっきと少し違って混乱した。空リストについて、先程は番兵で処理していたが、今回ははじめに `return null` して処理している。
+- FirstSolution.java, L15: スタックを使う方法。さっきのgoto-untrapped氏のコードと少し違っていて、混乱した。空リストについて、先程は番兵で処理していたが、今回ははじめに `return null` して処理している。
 - [ifのdanglingについて](https://github.com/ryoooooory/LeetCode/pull/14#discussion_r1657558481)
   - どうでもいいことだが、「{}を省略すること」の「ぶらさがり」感がピンときていない
   - https://en.wikipedia.org/wiki/Dangling_else パース結果が一つに決まらなくなるので、どのifに対するelseなのか「ぶらぶらする」、ぐらい？
