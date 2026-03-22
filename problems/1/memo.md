@@ -77,11 +77,11 @@ class Solution {
 - Javaの例外についてよくわからないので、手元にある入門書を見ておく。読みやすいがそれほど信用できない気もしているので、真に受けすぎないようにしておく
   - できたら公式ドキュメントを読んでおきたいが、大変なのでほどほどにしておく
   - Javaの例外を表すクラスには、大きく分けてError、Exception、RuntimeExceptionの3つがある。今回関係するのは後者2つのどちらかだと思う
-  - Exceptionは必ず補足される必要がある。RuntimeExceptionはそうではない
+  - Exceptionは必ず捕捉される必要がある。RuntimeExceptionはそうではない
     - 後者は前者のsubclassである。特定のsubclassだけ特別扱いされるのはなんとなく変な感じもするが、どうやらそういうものらしい
     - ドキュメントはこのあたりか https://docs.oracle.com/en/java/javase/26/docs/specs/jls/jls-11.html#jls-11.1.1
   - そのため、LeetCodeに限ると、RuntimeExceptionはthrowできるが、Exceptionはできない
-    - 補足してください、というコンパイルエラーになる
+    - 捕捉してください、というコンパイルエラーになる
     - `public int[] twoSum(int[] nums, int target) throws Exception` と宣言しても、呼び出し側で同じコンパイルエラーが出る
 - どのException（のsubclass）をthrowすべきか？
   - https://docs.oracle.com/en/java/javase/26/docs/api/java.base/java/lang/Exception.html
@@ -102,7 +102,7 @@ class Solution {
 - 返り値の型が `int[]` なのは、ちょっとだけ気持ちが悪い
   - いつも長さ2なので
   - Javaで複数の値を返すのは面倒なので、これも妥協の範囲なのかな
-- 追記：ところで、配列ではboxingが不要なこととか、理由を理解していない、と気付いた
+- 追記：ところで、配列ではboxingが不要なこと（ArrayListなどのコレクションとは違う）とか、理由を理解していない、と気付いた
   - 調べなきゃいけないが、また時間がかかりそうなので、一旦おいておく
 
 ここまで2時間ぐらい。
@@ -180,3 +180,50 @@ class Solution {
 
 - 3時間半ぐらい？
 - 次回は https://leetcode.com/problems/group-anagrams/description/ に取り組む予定
+
+
+
+
+
+
+## 追記：別の方法
+上述の[発想の話](https://discord.com/channels/1084280443945353267/1229085360403775569/1229955174446137344)で出てきたやり方でも書いてみる。
+
+```java
+// ソートして、左右からポインタを動かす方法
+class Solution {
+  public int[] twoSum(int[] nums, int target) {
+    Comparator<NumWithIndex> comparator = Comparator.comparing(numWithIndex -> numWithIndex.num);
+    var numsWithIndexes = new NumWithIndex[nums.length];
+    for (int i = 0; i < nums.length; ++i) {
+      numsWithIndexes[i] = new NumWithIndex(nums[i], i);
+    }
+    Arrays.sort(numsWithIndexes, comparator);
+
+    int left = 0;
+    int right = nums.length - 1;
+    while (left < right) {
+      int sum = numsWithIndexes[left].num + numsWithIndexes[right].num;
+      if (sum == target) {
+        return new int[] {numsWithIndexes[left].index, numsWithIndexes[right].index};
+      } else if (sum < target) {
+        ++left;
+      } else {
+        --right;
+      }
+    }
+    return null;
+  }
+
+  record NumWithIndex(int num, int index) {}
+}
+```
+
+- Comparatorの使い方がわからずに、20分ぐらい調べた。というか、今も何も理解していない
+  - 理解できなかった一つの理由は、ジェネリクスを知らないこと。そのせいでドキュメントの型を読めていないことなど
+  - `Comparator.comparing` であって `Comparator<>.comparing` ではない
+  - `.equals` とコンパチブルではない（`.index`を見ていない）のはよくないかもしれない
+- ロジックの部分は8分ぐらいで書いた
+  - leftとrightと書いたが、step 3 でのコードのように、i（つまりright）が主役で、iを止めるごとにj（つまりleft）が動く、としたほうがイメージしやすいかも
+- 変数名 `numsWithIndexes` はちょっとうるさい
+- こうして、まだ調べたり考えたりすべきことはあるが、一旦やめる
