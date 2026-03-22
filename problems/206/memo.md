@@ -32,15 +32,17 @@ class Solution {
 ```
 
 解いてから考えたこと：
+- 追記：発想は、元のリスト `head` の先頭を `target_node` の先頭に移す、というのを繰り返す、ということ。
 - 5分ぐらいで書いて、3分ぐらい見直した。
-  - はじめ、`source_node = source_node.next;` と `node.next = target_node;` の順番を逆にしてしまった。
-  - 小さいサンプルで、頭のなかで行ごとに動作させたら、なんとか気づいた
+  - はじめ、`source_node = source_node.next;` と `node.next = target_node;` の順番を逆にする間違いをした
+    - これだと `source_node.next = target_node;` してから `source_node = source_node.next;` するのと同じになってしまう
+  - 見直しするなかで、実行する前に気づけた。小さいサンプルで、頭のなかで行ごとに動かしたら、なんとか気づいた
 - 変数名は、他にも良いのがありそうだが、（今のところ）許容範囲と感じる
+  - 追記：変数名をlowerCamelCaseにすべき
 - 空行の入れ方はおかしいかもしれない。書いていて区切りたくなったところに入れた
   - `source_node` の先頭ノードを `source_node` から外して、`target_node` に付けかえる、をひとまとまりと見た
-- `node` 変数はいらないかもしれないと思ったが、わからないし間違えそうなのでこう書いた
+- `node` 変数はいらないかもしれないと思ったが、わからないし、間違えそうなのでこう書いた
 - 引数 `head` を変更すべきかどうか
-- 追記：変数名をcamelCaseにすべき
 
 解き始めてからここまで、15分ちょっと。
 
@@ -53,22 +55,22 @@ class Solution {
 思ったこと：
 - 再帰を使う人もいる。たしかに、LeetCodeの「Follow up」にもそう書いてある
   - これもやったことがある
-  - `head.next` を普通にreverseすると、`ListNode` の末尾に付け加える必要が出てきてやりづらい。そこで、「末尾に付け加えるリスト」も引数に入れたヘルパー関数を作れば[よい](https://github.com/goto-untrapped/Arai60/pull/27/changes#diff-0f2410aa19c752486fd39f11faebbe287a36b9dc9016dd3c6c1e0531259b409aR55)
+  - 再帰で考えるなら、まず `head.next` をreverseしたくなる。普通にreverseすると、`ListNode` の末尾に（`head` を）付け加える必要が出てきてやりづらい。そこで、「（reverseしたあと）末尾に付け加えるリスト」も引数に入れたヘルパー関数を作れば[よい](https://github.com/goto-untrapped/Arai60/pull/27/changes#diff-0f2410aa19c752486fd39f11faebbe287a36b9dc9016dd3c6c1e0531259b409aR55)
   - 参照をうまく使って（という言い方でいいのか？）処理する人も[いる](https://github.com/goto-untrapped/Arai60/pull/27/changes#diff-0f2410aa19c752486fd39f11faebbe287a36b9dc9016dd3c6c1e0531259b409aR40)。`head.next` をreverseすると、その末尾は `head.next` と表せる
     - `var newTail = head.next` とか、名前があったほうが見やすい気がする。読むのにちょっと悩んだ
     - 追記：元の先頭は、reverseすると末尾になる、ということなので、ある意味当たり前ではあるものの……。
 - スタックで書く方法も[ある](https://github.com/goto-untrapped/Arai60/pull/27/changes#diff-0f2410aa19c752486fd39f11faebbe287a36b9dc9016dd3c6c1e0531259b409aR65)
   - 前から順にスタックに積むと、積まれ方はすでに逆順になっている。スタックから取り出しながら、`.next` を書き換える。
-  - 「後ろからループ」できるならreverseは簡単なはずで、そのために一度リストをスタックに取り出す、という感じか
+  - 「リストの末尾からループ」できるならreverseは簡単なはずで、そのために一度リストをスタックに取り出す、という感じか
 
 goto-untrapped氏のレビューを見る。
-- 再帰について、組を返すという考えもある https://github.com/goto-untrapped/Arai60/pull/27#discussion_r1641596128
-  - （上の「参照をうまく使」う方法で、再帰呼び出しで返ってくるリストの末尾について、`head.next` と参照するかわりに返り値に含めてしまう、という感じ）
+- 再帰を使う方法について、組を返すという方法もある https://github.com/goto-untrapped/Arai60/pull/27#discussion_r1641596128
+  - （上の「参照をうまく使」う方法で、再帰呼び出しで返ってくるリストについて、その末尾を `head.next` と参照するかわりに返り値に含めてしまう、という感じ）
 - Javaでどうやって組を返すのか気になった
   - ChatGPTに訊いたら、クラスを作るか `record` を使うとのこと。
   - `record` はJava 16からの機能だそうだ（[「This JEP proposes to finalize the feature in JDK 16」](https://openjdk.org/jeps/395)）。
   - `record` の使い方については、もっと調べたほうがいいかもしれない。しかし、以下のコード例を見たりして、雰囲気がわかって満足したので次に進む
-  - （あと、組を返すのは、このようにJavaだと少し面倒だとわかり、今回の問題だと進んで選びたくはない感じもする）
+  - （あと、組を返すのは、このようにJavaだと少し面倒だとわかった……そうなると、今回の問題だと進んでこの方法を選びたくはない感じもする）
 
 ```java
 // ChatGPTによるコード
@@ -81,7 +83,7 @@ public static Result calculate(int a, int b) {
 ```
 
 ryoooooory氏の[コード](https://github.com/ryoooooory/LeetCode/pull/14)も見る。
-- FirstSolution.java, L4: 自分が変数名 `target_node` としたものを `prev` と呼んでいる。気持ちがよくわかっていないが、処理済みだから、ということ？
+- FirstSolution.java, L4: 自分が変数名 `target_node` としたものを変数名 `prev` としている。気持ちがよくわかっていないが、処理済みだから、ということ？
   - 少しわかってきた。`prev = current` としてから次のループに行くので、確かに `prev` という感じがする。では、なぜ初めわからなかったかというと、自分としては、変数の指すものとして、各ノードというよりリスト全体に意識が向いていたからだと思った。
 - FirstSolution.java, L15: スタックを使う方法。さっきのgoto-untrapped氏のコードと少し違っていて、混乱した。空リストについて、先程は番兵で処理していたが、今回ははじめに `return null` して処理している。
 - [ifのdanglingについて](https://github.com/ryoooooory/LeetCode/pull/14#discussion_r1657558481)
@@ -156,9 +158,14 @@ class Solution {
 
 
 
+
+
+
+
 ## 追記：他の方法について
 - 再帰を使う方法や、スタックを使う方法も、試しに書いてはみた。
-- 元々はこのファイルに残しておくつもりはなかったが、やっぱり書いておいたほうが良いような気がしてきたので。
+- コードについて、あまりよく検討できていないが、とりあえず書き残しておく。
+  - ~~元々はこのファイルに残しておくつもりはなかったが、やっぱり書いておいたほうが良いような気がしてきたので。~~
 
 ```java
 // ためしに再帰を使う
