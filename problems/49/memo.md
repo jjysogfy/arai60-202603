@@ -11,6 +11,7 @@
 - Javaの書き方がわからない
   - この状況でのソート（配列の `Comparator`？）
   - 配列などをkeyとする `Map`？
+    - 追記：少なくとも普通の配列は可変なので、やばそう
 - さっさと人の答えを読もう
 - ここまで書くのになんだかんだ15分ぐらいかかっている気がする
 
@@ -21,4 +22,29 @@ Javaでたくさん解いている人のコードを参照する。
   - 賢い、「カウント」ではなく、ソートした文字列を扱う（例：`["abt", "ant","ant", "aet","aet","aet"]`）
   - いや、たぶん自分も前に見ているが、すっかり忘れていた
   - 変数名も考えられていると感じる
+
+```java
+// goto-untrapped氏と同じコードになった
+class Solution {
+  public List<List<String>> groupAnagrams(String[] strs) {
+    Map<String, List<String>> sortedToAnagrams = new HashMap<>();
+    for (String str : strs) {
+      char[] sortedChars = str.toCharArray();
+      Arrays.sort(sortedChars);
+      String sorted = String.valueOf(sortedChars);
+
+      if (!sortedToAnagrams.containsKey(sorted)) {
+        sortedToAnagrams.put(sorted, new ArrayList<>());
+      }
+      sortedToAnagrams.get(sorted).add(str);
+    }
+
+    return ArrayList<>(sortedToAnagrams.values());
+  }
+}
+```
+
+
+# step 2 : 読む
+上述のgoto-untrapped氏、ryoooooory氏のほか、
 
