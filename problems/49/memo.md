@@ -158,3 +158,35 @@ step 1に載せたgoto-untrapped氏のコードと同一なので省略
 
 4回目：3:55
 
+- コードは、step 1に載せたgoto-untrapped氏のコードと同一なので省略
+  - ……というのは不自然なような気もしてきた。他の選択肢が見えてないということなのでは？
+
+
+## 反省： step 2.1 の続き
+- そこで、コードを見直してみたが、ほぼ何も思いつかない
+- [ryoooooory氏のコード](https://github.com/ryoooooory/LeetCode/pull/1/changes)はざっと眺めただけだった。もう少し読んでみる
+  - いろいろの違いはあるものの、どの点もgoto-untrapped氏のコードのほうが好みに合う気がする
+  - ryoooooory氏は、`sortedToAnagrams` を経由せず直接にresultを構築
+  - `String.valueOf` vs `new String`
+  - 変数名が参考になる
+    - goto-untrapped氏のコードに取り入れるなら `sortedToGroup` とかか？ この場合は `sortedToAnagrams` のほうがわかりやすい気がする
+  - `sortedToAnagrams` に追加する処理の書き方
+    - `if (sortedToAnagrams.containsKey(sorted)) { ... } else { ... }` のようになっている
+    - その部分だけ書いてみる
+
+```java
+      if (sortedToAnagrams.containsKey(sorted)) {
+        sortedToAnagrams.get(sorted).add(str);
+      } else {
+        sortedToAnagrams.put(sorted, new ArrayList<>(Collections.singletonList(str)));
+      }
+```
+
+- 取り組み方に何かと課題を感じるが、とりあえず今回はここでストップ
+  - 2日空いてしまった。時間がかかりすぎてしまったのが理由の一つだ
+  - 今の感じだと「調べ学習」がメインになってしまっている感がある
+    - （それはそれで勉強になっている気はする、が……）
+  - 練習のメインの目的からは、少しズレているのではないか
+    - ひとまず、コードの読み・書きのウェイトをもっと増やすべきなのでは
+  - ちょっとこれでは効率が悪い気がしている
+
