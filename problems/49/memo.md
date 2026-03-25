@@ -5,21 +5,16 @@
 解くまえ・解くあいだに思ったこと：
 - 解いたことがある
   - anagramかどうかの判定：どの文字が何回現れるか、という「カウント」を `Map` なり array なりで保持し、それが等しいか判定すればいい
-  - その「カウント」をソートして、各groupごとにまとめる
-  - 「カウント」をkeyとする `Map` を作る手もあるか
 - Javaの書き方がわからない
   - この状況でのソート（配列の `Comparator`？）
   - 配列などをkeyとする `Map`？
-    - 追記：少なくとも普通の配列は可変なので、やばそう
 - さっさと人の答えを読もう
-- ここまで書くのになんだかんだ15分ぐらいかかっている気がする
 
 Javaでたくさん解いている人のコードを参照する。
 - https://github.com/goto-untrapped/Arai60/pull/6/changes
 - https://github.com/ryoooooory/LeetCode/pull/1/changes
 - goto-untrapped氏の `GroupAnagramsStep4.java` を見てみた
-  - 賢い、「カウント」ではなく、ソートした文字列を扱う（例：`["abt", "ant","ant", "aet","aet","aet"]`）。たぶん前に見たことがあるが、すっかり忘れていた
-  - 変数名も考えられていると感じる
+  - 賢い、「カウント」ではなく、ソートした文字列を扱う。たぶん前に見たことがあるが、すっかり忘れていた
 
 ```java
 // goto-untrapped氏と同じコードになった
@@ -46,10 +41,11 @@ class Solution {
   - いきなり人のstep 4を参考にするとレビューするところが少なくなってしまうから、LeetCodeの答えとかをまずは参考にすべきかも
 
 
-# step 2 : 読む
+# step 2.1 : 読む
 上述のgoto-untrapped氏、ryoooooory氏のほか、たくさん解いている人のPRを読んでみる
 
 - https://github.com/olsen-blue/Arai60/pull/12/changes
+
 - 「何が辞書キーとして使える/使えないかも調べてみると」 https://github.com/olsen-blue/Arai60/pull/12/changes#r1915836160
   - たしかに。
   - https://docs.oracle.com/en/java/javase/26/docs/api/java.base/java/util/Map.html#:~:text=Note:%20great%20care%20must%20be%20exercised%20if%20mutable%20objects%20are%20used%20as%20map%20keys.%20The%20behavior%20of%20a%20map%20is%20not%20specified%20if
@@ -86,7 +82,8 @@ System.out.println(m.equals(m2));
     - https://docs.oracle.com/en/java/javase/26/docs/api/java.base/java/util/HashMap.html
     - https://docs.oracle.com/en/java/javase/26/docs/api/java.base/java/lang/Object.html#hashCode()
     - そのあたりは大したこと書いてなさそう？ 「However, the programmer should be aware that producing distinct integer results for unequal objects may improve the performance of hash tables.」
-- olsen-blue氏のコードの話に戻る。
+
+olsen-blue氏のコードの話に戻る。
 - goto-untrapped氏のコードでいう `sorted` の変数名が、olsen-blue氏のコードでの `common_key` である
   - この変数名はちょっと引っかかった
   - アナグラムたちに共通するキー、ぐらいの意味か
@@ -103,7 +100,7 @@ System.out.println(m.equals(m2));
 
 
 コメント集も見る
-- frozenset https://github.com/kazukiii/leetcode/pull/13#discussion_r1642894457
+- frozenset を使う方法 https://github.com/kazukiii/leetcode/pull/13#discussion_r1642894457
   - 書いてみよう
 
 ```java
@@ -131,8 +128,7 @@ class Solution {
 
 - 一発で通らず、結構間違えた。20分ぐらいかかった
   - コードをちゃんと読み直す前にsubmitして（これは良くない）、その後デバッグして時間がかかったりした
-    - 無駄な書き換えをしてもとに戻したりもした：変な勘違いをして、`Map<Character, Integer>` を `Set<Map.Entry<Character, Integer>>` に書き換えた
-  - Map のドキュメントで欲しいメソッドを探すのにも時間がかかった
+  - `Map` のドキュメントで欲しいメソッドを探すのにも時間がかかった
 - `charToCount = Map.copyOf(charToCount);` は、このコードならやらなくて良いかも
 
 引き続きコメント集を見る
@@ -143,12 +139,22 @@ class Solution {
   - エスケープシーケンスは、たとえば `c` が数字のときは `#c` に置き換え、`#` そのものは `##` に置き換える、など（`55` → `#52`）
   - 可変長数値表現とは？
     - バイト列で数値列を表現
-    - 「最上位ビットを1にした場合、続く1オクテットが値の一部」
-  - この問題ではどういうことか。
-    - ichika0615氏は「絶対に現れない記号(`'$'`とかでしょうか)を間に挟む」「`character + '$' + str(count)`」と書いているのだった
-    - むしろ `'$' + character + str(count)` でも良いか。`character` は1文字だから
-  - 可変長数値表現はどういう発想か、と考える
     - たとえば、数値列 `10, 3, 2026` を `1. 0$ 3$ 2. 0. 2. 6$` とエンコードする、みたいな雰囲気（どちらかというと `.1 $0 $3 .2 .0 .2 $6` だが）
     - `$` `.` は1bitで表現できる。残る7bitを数値の表現に使う
+  - ichika0615氏は「絶対に現れない記号(`'$'`とかでしょうか)を間に挟む」「`character + '$' + str(count)`」と書いている
+    - むしろ `'$' + character + str(count)` でも良いか。`character` は1文字だから
   - この問題と可変長数値表現の関係はよくわからなかった
+
+
+# step 2.2 : 清書
+step 1に載せたgoto-untrapped氏のコードと同一なので省略
+
+
+# step 3
+1回目：4:13、2回目:3:10、3回目：2:45
+
+- 本当に丸暗記になっている感じがあり、これじゃ意味が薄いかも
+- とりあえず、もう少し考えながらもう一度やっておく
+
+4回目：3:55
 
