@@ -5,6 +5,8 @@
 解くまえ・解くあいだに思ったこと：
 - 解いたことがある
   - anagramかどうかの判定：どの文字が何回現れるか、という「カウント」を `Map` なり array なりで保持し、それが等しいか判定すればいい
+  - その「カウント」でソートして（例：`["bat", "nat","tan", "ate","eat","tea"]`）、各groupごとにまとめる
+  - 「カウント」をkeyとする `Map` を作る手もあるか
 - Javaの書き方がわからない
   - この状況でのソート（配列の `Comparator`？）
   - 配列などをkeyとする `Map`？
@@ -62,6 +64,7 @@ class Solution {
   - そもそも、自身を含む `HashMap` とか作りたくないけど
 
 ```java
+// 自分自身を含む `HashMap` の `equals` についての実験
 var m = new HashMap<String, Object>();
 m.put("", m);
 var m2 = new HashMap<String, Object>();
@@ -89,6 +92,7 @@ olsen-blue氏のコードの話に戻る。
   - アナグラムたちに共通するキー、ぐらいの意味か
   - うーん、そう言われると真っ当な気もする
   - いきなり「共通のキーと単語をしまう箱を用意します」（`common_key_to_words = defaultdict(list)`）と言われると、何に共通するの？とは思う
+    - 追記：微妙に、key common to words（単語に共通のキー）っぽくも見えてしまうかも？
   - 「共通のキーとして、単語をソートしたものを使います」（`common_key = tuple(sorted(word))`）まで見れば、なるほど、と思うかも
   - 良いか悪いかよくわからない
 - 「度数分布」という言い方、たしかに https://github.com/olsen-blue/Arai60/pull/12#pullrequestreview-2548365222
