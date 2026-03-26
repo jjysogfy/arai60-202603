@@ -162,3 +162,45 @@ class Solution {
 - ちゃんと計っていないが、全体で4、5時間かかっている気がする。
   - このファイル（`20-Valid-Parentheses.md`）を書くのにも時間がかかっていると思う。余計なことを書いていそう？
 - 見直していて思ったが `var top = closeBracketStack.pop();` の `var` は危うい。`Character` どうしの `==` は意図したものにならないので
+
+
+
+# step 4 : レビューを反映
+step 3 をもとに、レビューを反映したコードに書き換え。
+
+```java
+class Solution {
+  public boolean isValid(String s) {
+    final Map<Character, Character> openToClose = Map.of(
+      '(', ')',
+      '{', '}',
+      '[', ']'
+    );
+    ArrayDeque<Character> closeBrackets = new ArrayDeque<>();
+
+    for (char c : s.toCharArray()) {
+      if (openToClose.containsKey(c)) {
+        closeBrackets.push(openToClose.get(c));
+        continue;
+      }
+      if (closeBrackets.isEmpty()) {
+        return false;
+      }
+      char expected = closeBrackets.pop();
+      if (c != expected) {
+        return false;
+      }
+    }
+
+    return closeBrackets.isEmpty();
+  }
+}
+```
+
+## 補足
+- hayashi-ay氏のコメントで「autoboxingや`valueOf`経由で作られた`Character`」とあった
+  - ここ、どういうことだろうと漠然と気になっていた
+    - 訊いたら良かったと思うが、こういう疑問をちゃんと形にするが苦手な気がする
+  - `new`ではないとかいうことか
+  - そもそも`new`がdeprecated（ https://docs.oracle.com/en/java/javase/26/docs/api/java.base/java/lang/Character.html#%3Cinit%3E(char) ）で、それはまさにそういう理由のようだ
+
