@@ -14,6 +14,7 @@
   - （Google検索するとJava 8（[2014年](https://en.wikipedia.org/wiki/Java_version_history)）など古いドキュメントがヒットしがちなので注意）
 - Language Specifications https://docs.oracle.com/en/java/javase/26/docs/specs/jls/index.html
 - 日本語ドキュメント https://www.oracle.com/jp/java/technologies/documentation.html
-- Google Java Style Guide https://google.github.io/styleguide/javaguide.html
+- java.util のソースコード https://github.com/openjdk/jdk/tree/master/src/java.base/share/classes/java/util
 - Learn Java https://dev.java/learn/
+- Google Java Style Guide https://google.github.io/styleguide/javaguide.html
 
