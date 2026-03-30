@@ -60,7 +60,7 @@ class Solution {
 - 15分ぐらい
   - 手を動かした時間だけ。実際にはもっとかかっている
 - 一発では通らず
-  - `while (true) {`末尾の`++index;`を忘れたなど
+  - （`while (true) {`末尾の`++index;`を忘れたなど）
 - ネストがかなり深くなってしまった
   - 浅くするには？ うまく関数化する、「`+`を読んだあと」というフラグを作る、など？
   - うまくやる方法を思いつかなかったので、そのまま書いた
@@ -79,11 +79,7 @@ class Solution {
 
 - https://github.com/ryoooooory/LeetCode/pull/19/changes
   - `email.charAt(i)`を利用
-    - 勝手な勘違いで、Unicodeの関係で遅いと思っていた
-      - 勘違いを言葉にしておきたい
-      - まずUnicodeをよくわかってないので、基本的なことをChatGPTに訊いた（そのうちもう少しちゃんと勉強すべきかも）
-      - 前から`i`番目のコードポイントは、時間計算量`O(len)`でしか求まらなさそう、と思った
-      - しかしこれは別の話だった：`charAt(i)`はコードポイントのことではないし、`codePointAt(i)`の`i`も「前から`i`番目」という意味ではなかった
+    - 勝手な勘違いで、サロゲートペアの関係で遅いと思っていた。そんなことはなさそう
   - `email.toCharArray()`と`email.charAt(i)`のどちらが良いのかはよくわからなかった
   - 「ホスト部に＠が来る場合もある」とのこと
     - Wikipediaにある例：`"very.(),:;<>[]\".VERY.\"very@\\ \"very\".unusual"@strange.example.com`
