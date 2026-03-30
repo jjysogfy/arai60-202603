@@ -221,3 +221,23 @@ class Solution {
   - `node` をshadowしたい気分もあるが、Javaではできない
 
 いろいろとよくわからなくなってきたが、さすがに時間をかけすぎているので、このあたりでとりあえずやめる。
+
+
+
+# step 4
+レビューをもとに書き直し。
+```java
+class Solution {
+  public ListNode reverseList(ListNode head) {
+    ListNode rest = head;
+    ListNode reversed = null;
+    while (rest != null) {
+      var node = rest;
+      rest = rest.next;
+      node.next = reversed;
+      reversed = node;
+    }
+    return reversed;
+  }
+}
+```
