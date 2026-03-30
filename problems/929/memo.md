@@ -79,8 +79,16 @@ class Solution {
 
 - https://github.com/ryoooooory/LeetCode/pull/19/changes
   - `email.charAt(i)`を利用
-    - 勝手な勘違いで、サロゲートペアのせいで遅いと思っていた。そういうことはなさそう？
-    - 参考：https://stackoverflow.com/questions/59710194/is-the-string-charat-method-fast-enough-to-use-again-and-again
-    - 内部の`char[]`に、境界チェック付きアクセスするだけと言っている
-- 
+    - 勝手な勘違いで、Unicodeの関係で遅いと思っていた
+      - 勘違いを言葉にしておきたい
+      - まずUnicodeをよくわかってないので、基本的なことをChatGPTに訊いた（そのうちもう少しちゃんと勉強すべきかも）
+      - 前から`i`番目のコードポイントは、時間計算量`O(len)`でしか求まらなさそう、と思った
+      - しかしこれは別の話だった：`charAt(i)`はコードポイントのことではないし、`codePointAt(i)`の`i`も「前から`i`番目」という意味ではなかった
+  - `email.toCharArray()`と`email.charAt(i)`のどちらが良いのかはよくわからなかった
+  - 「ホスト部に＠が来る場合もある」とのこと
+    - Wikipediaにある例：`"very.(),:;<>[]\".VERY.\"very@\\ \"very\".unusual"@strange.example.com`
+
+- https://github.com/seal-azarashi/leetcode/pull/14/changes
+  - 「ユーザーがゴミを1つ突っ込んできたら例外投げて動かないコードでいいんですか」とのコメント
+  - 正規表現を使う方法
 
