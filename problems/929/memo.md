@@ -69,4 +69,18 @@ class Solution {
 
 
 # step 2
+- https://github.com/goto-untrapped/Arai60/pull/8/changes
+  - 文字列のメソッドを活用
+  - `split`、`replace`、`replaceAll`など
+  - ドキュメントを見なければ
+    - https://docs.oracle.com/en/java/javase/26/docs/api/java.base/java/lang/String.html
+  - 一字ずつ見る方法（`UniqueEmailAddressesStep4_2.java`）では、フラグ変数を使っている
+  - 変数名：`uniqueEmails`、`formattedEmail`（上の`result`相当）
+
+- https://github.com/ryoooooory/LeetCode/pull/19/changes
+  - `email.charAt(i)`を利用
+    - 勝手な勘違いで、サロゲートペアのせいで遅いと思っていた。そういうことはなさそう？
+    - 参考：https://stackoverflow.com/questions/59710194/is-the-string-charat-method-fast-enough-to-use-again-and-again
+    - 内部の`char[]`に、境界チェック付きアクセスするだけと言っている
+- 
 
