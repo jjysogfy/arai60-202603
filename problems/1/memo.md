@@ -227,3 +227,53 @@ class Solution {
   - leftとrightと書いたが、step 3 でのコードのように、i（つまりright）が主役で、iを止めるごとにj（つまりleft）が動く、としたほうがイメージしやすいかも
 - 変数名 `numsWithIndexes` はちょっとうるさい
 - こうして、まだ調べたり考えたりすべきことはあるが、一旦やめる
+
+
+
+# step 4
+レビューを反映する。
+```java
+class Solution {
+  public int[] twoSum(int[] nums, int target) {
+    Map<Integer, Integer> numToIndex = new HashMap<>();
+    for (int i = 0; i < nums.length; ++i) {
+      int complement = target - nums[i];
+      if (numToIndex.containsKey(complement)) {
+        return new int[] {numToIndex.get(complement), i};
+      }
+      numToIndex.put(nums[i], i);
+    }
+    return null;
+  }
+}
+```
+
+```java
+// 別の方法
+// 変数名のみ変更
+class Solution {
+  public int[] twoSum(int[] nums, int target) {
+    var numsAndIndexes = new NumAndIndex[nums.length];
+    for (int i = 0; i < nums.length; ++i) {
+      numsAndIndexes[i] = new NumAndIndex(nums[i], i);
+    }
+    Arrays.sort(numsAndIndexes, Comparator.comparing(numAndIndex -> numAndIndex.num));
+
+    int left = 0;
+    int right = nums.length - 1;
+    while (left < right) {
+      int sum = numsAndIndexes[left].num + numsAndIndexes[right].num;
+      if (sum == target) {
+        return new int[] {numsAndIndexes[left].index, numsAndIndexes[right].index};
+      } else if (sum < target) {
+        ++left;
+      } else {
+        --right;
+      }
+    }
+    return null;
+  }
+
+  record NumAndIndex(int num, int index) {}
+}
+```
