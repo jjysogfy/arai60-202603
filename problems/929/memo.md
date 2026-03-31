@@ -70,16 +70,15 @@ class Solution {
 
 # step 2
 - https://github.com/goto-untrapped/Arai60/pull/8/changes
-  - 文字列のメソッドを活用
+  - フラグ変数を使っている（`UniqueEmailAddressesStep4_2.java`）
+  - `String`のメソッドを活用する方法もある
   - `split`、`replace`、`replaceAll`など
-  - ドキュメントを見なければ
     - https://docs.oracle.com/en/java/javase/26/docs/api/java.base/java/lang/String.html
-  - 一字ずつ見る方法（`UniqueEmailAddressesStep4_2.java`）では、フラグ変数を使っている
-  - 変数名：`uniqueEmails`、`formattedEmail`（上の`result`相当）
+  - 参考になる変数名：`formattedEmail`（上の`result`相当）、`uniqueEmails`
 
 - https://github.com/ryoooooory/LeetCode/pull/19/changes
   - `email.charAt(i)`を利用
-    - 勝手な勘違いで、サロゲートペアの関係で遅いと思っていた。そんなことはなさそう
+    - 勝手な勘違いで、`charAt`はサロゲートペアの関係で遅いと思っていた。そんなことはなさそう
   - `email.toCharArray()`と`email.charAt(i)`のどちらが良いのかはよくわからなかった
   - 「ホスト部に＠が来る場合もある」とのこと
     - Wikipediaにある例：`"very.(),:;<>[]\".VERY.\"very@\\ \"very\".unusual"@strange.example.com`
@@ -87,4 +86,18 @@ class Solution {
 - https://github.com/seal-azarashi/leetcode/pull/14/changes
   - 「ユーザーがゴミを1つ突っ込んできたら例外投げて動かないコードでいいんですか」とのコメント
   - 正規表現を使う方法
+
+コメント集も軽く見ておいた。
+- ユースケースの想定 https://discord.com/channels/1084280443945353267/1251052599294296114/1254245440690589787
+  - https://discord.com/channels/1084280443945353267/1355903616032178327/1370028729186910269
+  - 想定外の入力について、いつどういう選択をとるべきなのか、よくわかっていない
+  - 例外を投げずに続けるとしたらどういう選択があるだろうか。`canonicalize`が`""`を返すとか？
+
+```java
+// `String`のメソッドを活用
+```
+
+```java
+// 正規表現を利用
+```
 
