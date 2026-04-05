@@ -158,7 +158,38 @@ class Solution {
 
 - 想定外の入力の処理をしていない
   - @が一つもないときだけ例外`ArrayIndexOutOfBoundsException`
+- ところで、`numUniqueEmails`、`canonicalize`はstaticでも良い気がする
 
 
 # step 3
+3回書いて、どれも3分程度で通った。
+
+```java
+class Solution {
+  public int numUniqueEmails(String[] emails) {
+    Set<String> canonicalizedEmails = new HashSet<>();
+    for (String email : emails) {
+      canonicalizedEmails.add(Solution.canonicalize(email));
+    }
+    return canonicalizedEmails.size();
+  }
+
+  public static String canonicalize(String email) {
+    String[] splitEmail = email.split("@", 2);
+    String localName = splitEmail[0];
+    String domainName = splitEmail[1];
+
+    String formattedLocalName = localName.split("\\+", 2)[0]
+      .replaceAll("\\.", "");
+    return formattedLocalName + "@" + domainName;
+  }
+}
+```
+
+
+# 次回について
+- 時間がかかっているのと、4月から忙しくなったのとでなかなか進まない
+- 次回からは、別の方法 https://discord.com/channels/1084280443945353267/1366778718705553520/1450943270799671337 で試す
+- 最低でも週2（土日）は進める
+- 次の問題：https://leetcode.com/problems/first-unique-character-in-a-string/
 
