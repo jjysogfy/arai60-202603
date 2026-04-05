@@ -92,12 +92,73 @@ class Solution {
   - https://discord.com/channels/1084280443945353267/1355903616032178327/1370028729186910269
   - 想定外の入力について、いつどういう選択をとるべきなのか、よくわかっていない
   - 例外を投げずに続けるとしたらどういう選択があるだろうか。`canonicalize`が`""`を返すとか？
+  - Yoshiki-Iwasa氏は`return i32::MIN;`している
 
 ```java
 // `String`のメソッドを活用
+// 例外を投げないことにしてみた
+// 変更部分のみ
+  public String canonicalize(String email) {
+    int indexOfAtSign = email.lastIndexOf("@");
+    if (indexOfAtSign == -1) {
+      return "";
+    }
+    String localName = email.substring(0, indexOfAtSign);
+    String domainName = email.substring(indexOfAtSign + 1);
+
+    int indexOfPlus = localName.indexOf("+");
+    if (indexOfPlus == -1) {
+      indexOfPlus = localName.length();
+    }
+    String formattedLocalName = localName.substring(0, indexOfPlus).replace(".", "");
+
+    return formattedLocalName + "@" + domainName;
+  }
 ```
+
+- seal-azarashi氏を参考に、正規表現を使うコードも：
 
 ```java
 // 正規表現を利用
+// 変更部分のみ
+  public String canonicalize(String email) {
+    String formatted = email.replaceAll("\\.(?=.*@)", "")
+      .replaceAll("\\+.*(?=@)", "");
+    return formatted;
+  }
 ```
+
+- ところでこのコード、計算量が二乗かかりそうな気がする
+  - 正規表現をよく知らないので自信がない
+  - コメント集にあるようにそれでも問題ない場面は多いかもしれない（ https://discord.com/channels/1084280443945353267/1330509715712643112/1363506350927118356 ）
+
+
+## 清書
+```java
+class Solution {
+  public int numUniqueEmails(String[] emails) {
+    Set<String> canonicalizedEmails = new HashSet<>();
+    for (String email : emails) {
+      canonicalizedEmails.add(this.canonicalize(email));
+    }
+    return canonicalizedEmails.size();
+  }
+
+  public String canonicalize(String email) {
+    String[] splitEmail = email.split("@", 2);
+    String localName = splitEmail[0];
+    String domainName = splitEmail[1];
+
+    String formattedLocalName = localName.split("\\+", 2)[0]
+      .replaceAll("\\.", "");
+    return formattedLocalName + "@" + domainName;
+  }
+}
+```
+
+- 想定外の入力の処理をしていない
+  - @が一つもないときだけ例外`ArrayIndexOutOfBoundsException`
+
+
+# step 3
 
