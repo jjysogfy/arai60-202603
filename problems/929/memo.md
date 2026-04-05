@@ -72,7 +72,7 @@ class Solution {
 - https://github.com/goto-untrapped/Arai60/pull/8/changes
   - フラグ変数を使っている（`UniqueEmailAddressesStep4_2.java`）
   - `String`のメソッドを活用する方法もある
-  - `split`、`replace`、`replaceAll`など
+    - `split`、`replace`、`replaceAll`など
     - https://docs.oracle.com/en/java/javase/26/docs/api/java.base/java/lang/String.html
   - 参考になる変数名：`formattedEmail`（上の`result`相当）、`uniqueEmails`
 
@@ -85,7 +85,7 @@ class Solution {
 
 - https://github.com/seal-azarashi/leetcode/pull/14/changes
   - 「ユーザーがゴミを1つ突っ込んできたら例外投げて動かないコードでいいんですか」とのコメント
-  - 正規表現を使う方法
+  - 正規表現を使う方法もある
 
 コメント集も軽く見ておいた。
 - ユースケースの想定 https://discord.com/channels/1084280443945353267/1251052599294296114/1254245440690589787
