@@ -1,5 +1,12 @@
 問題：https://leetcode.com/problems/first-unique-character-in-a-string/
 
+# 取り組み方
+https://discord.com/channels/1084280443945353267/1366778718705553520/1450943270799671337
+
+にあるような、軽めの方法で取り組んでみることにした。
+
+が、やってみたら、結局もとの方法と同じような感じになってしまった。
+
 # step 1
 - 取り組んだことがあると思う
 
@@ -90,13 +97,36 @@ class Solution {
 
 
 # step 2
+たくさん解いている方々：
 - https://github.com/goto-untrapped/Arai60/pull/17/changes
 - https://github.com/ryoooooory/LeetCode/pull/20/changes
 
-コメント集
+コメント集：
 - https://discord.com/channels/1084280443945353267/1201211204547383386/1211166072552816680
   - 「一回だけ見た、とかですかね。あ、unique でいいか。」
 
+ほかの方々：
+- https://github.com/kt-from-j/leetcode/pull/12
+
+結局、単にカウントするのが一番単純で好みだと思った。
+```java
+class Solution {
+  public int firstUniqChar(String s) {
+    Map<Character, Integer> letterToCount = new HashMap<>();
+    for (char c : s.toCharArray()) {
+      letterToCount.merge(c, 1, Integer::sum);
+    }
+
+    for (int i = 0; i < s.length(); ++i) {
+      if (letterToCount.get(s.charAt(i)) == 1) {
+        return i;
+      }
+    }
+    return -1;
+  }
+}
+```
 
 # step 3
+2分ぐらいで書けるようになった。
 
