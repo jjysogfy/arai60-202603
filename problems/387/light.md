@@ -108,6 +108,32 @@ class Solution {
 ほかの方々：
 - https://github.com/kt-from-j/leetcode/pull/12
 
+変数名を変えたりしてみる。
+```java
+import java.util.SequencedMap;
+
+class Solution {
+  public int firstUniqChar(String s) {
+    SequencedMap<Character, Integer> uniqueToIndex = new LinkedHashMap<>();
+    Set<Character> seen = new HashSet<>();
+    for (int i = 0; i < s.length(); ++i) {
+      char c = s.charAt(i);
+      if (seen.contains(c)) {
+        uniqueToIndex.remove(c);
+        continue;
+      }
+      uniqueToIndex.put(c, i);
+      seen.add(c);
+    }
+
+    if (uniqueToIndex.isEmpty()) {
+      return -1;
+    }
+    return uniqueToIndex.firstEntry().getValue();
+  }
+}
+```
+
 結局、単にカウントするのが一番単純で好みだと思った。
 ```java
 class Solution {
