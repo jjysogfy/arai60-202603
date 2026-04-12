@@ -1,3 +1,5 @@
+問題：https://leetcode.com/problems/top-k-frequent-elements/
+
 # step 1
 21分。Javaがわからないせいで時間がかかった。
 ```java
@@ -24,3 +26,11 @@ class Solution {
   - 次のように2行に分けるかなあ
   - `Comparator<Map.Entry<Integer, Integer>> countComparator = Comparator.comparing(Map.Entry::getValue);`
   - `numAndCount.sort(countComparator.reversed());`
+
+# step 2
+- https://github.com/goto-untrapped/Arai60/pull/55/changes
+  - `entrySet`じゃなく`keySet`を使って、`Comparator`で`numToCount`にアクセスしている。なるほど
+  - 「JavaのPriorityQueueへの要素追加はofferだっけと思って調べたらofferとadd2種類あるんですね」
+  - （Stream APIについて）「なんだかんだループで書くほうが自由度が高いことが多いので。」
+  - コードは一部しか読めていないが、疲れたのでやめる
+
