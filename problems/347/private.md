@@ -46,7 +46,10 @@ class Solution {
 
 - https://github.com/ryoooooory/LeetCode/pull/16/changes
   - 「TreeMap も見ておいてください。私は、PriorityQueue よりもこちらのほうが大事な感覚があります。」
+    - じゃあTreeMapで書いてみよう
   - 「Map.Entry を pair や tuple の代わりに使っている点に違和感を感じました。」
+    - なるほど、これ良くないのか
+  - 「forでも問題ありませんが、iterator を使っても良さそうです」
 
 TreeMapを使う（PriorityQueueを使う方法と同じ）：
 ```java
@@ -63,5 +66,57 @@ TreeMapを使う（PriorityQueueを使う方法と同じ）：
 ```
 
 - Comparatorを使うとコードが長くなりがちと感じる
-  - 型推論が弱いのも面倒。`reversed`を気楽に使えない
+  - （型推論が弱いのも面倒。`reversed`を気楽に使えない）
+  - 理解していなかったが`.thenComparing(Comparator.naturalOrder())`は必要。これが無いとcountが同じnumたちが省かれてしまう！
 - TreeSetはNavigableSetで受けたほうが良いのかな
+
+少しドキュメントを見たりして書き直す。
+- `comparingInt`を使うと型推論が効いてくれる
+- Stream.limitを知った
+```java
+class Solution {
+  public int[] topKFrequent(int[] nums, int k) {
+    Map<Integer, Integer> numToCount = new HashMap<>();
+    for (int num : nums) {
+      numToCount.merge(num, 1, Integer::sum);
+    }
+
+    List<Integer> sortedNums = new ArrayList<>(numToCount.keySet());
+    sortedNums.sort(Comparator.comparingInt(numToCount::get).reversed());
+    return sortedNums.stream()
+      .mapToInt(Integer::intValue)
+      .limit(k)
+      .toArray();
+  }
+}
+```
+
+Stream APIの代わりにループを使う。iterator、というかfor-eachを使ってみる
+```java
+class Solution {
+  public int[] topKFrequent(int[] nums, int k) {
+    Map<Integer, Integer> numToCount = new HashMap<>();
+    for (int num : nums) {
+      numToCount.merge(num, 1, Integer::sum);
+    }
+
+    List<Integer> sortedNums = new ArrayList<>(numToCount.keySet());
+    sortedNums.sort(Comparator.comparingInt(numToCount::get).reversed());
+    // int[] result = new int[k];
+    // for (int i = 0; i < k; ++i) {
+    //   result[i] = sortedNums.get(i);
+    // }
+    // return result;
+    int[] result = new int[k];
+    int index = 0;
+    for (int num : sortedNums) {
+      if (index >= k) {
+        break;
+      }
+      result[index] = num;
+      ++index;
+    }
+    return result;
+  }
+}
+```
