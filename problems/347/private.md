@@ -51,10 +51,15 @@ class Solution {
     - なるほど、これ良くないのか
   - 「forでも問題ありませんが、iterator を使っても良さそうです」
 
+調べごとをしたメモ：
+- `.comparing`でなく`.comparingInt`を使うと型推論が効いてくれる
+- Stream.limitを知った
+
 TreeMapを使う（PriorityQueueを使う方法と同じ）：
 ```java
-    Comparator<Integer> compareCounts = Comparator.comparing(numToCount::get);
-    TreeSet<Integer> countToNum = new TreeSet<>(compareCounts.thenComparing(Comparator.naturalOrder()));
+    Comparator<Integer> compareCounts = Comparator.comparingInt(numToCount::get);
+    TreeSet<Integer> countToNum =
+      new TreeSet<>(compareCounts.thenComparing(Comparator.naturalOrder()));
     for (Integer num : numToCount.keySet()) {
       countToNum.add(num);
       if (countToNum.size() > k) {
@@ -65,14 +70,15 @@ TreeMapを使う（PriorityQueueを使う方法と同じ）：
     return countToNum.stream().mapToInt(Integer::intValue).toArray();
 ```
 
-- Comparatorを使うとコードが長くなりがちと感じる
-  - （型推論が弱いのも面倒。`reversed`を気楽に使えない）
-  - 理解していなかったが`.thenComparing(Comparator.naturalOrder())`は必要。これが無いとcountが同じnumたちが省かれてしまう！
+- 理解していなかったが`.thenComparing(Comparator.naturalOrder())`は必要。これが無いとcountが同じnumたちが省かれてしまう！
+  - Comparatorを1文にまとめるなら、
+  - `Comparator.comparingInt((Integer num) -> numToCount.get(num))`
+  - `.thenComparing(Comparator.naturalOrder())`
+  - などと、ラムダで型を指定すれば良い
+  - （ChatGPTに訊いた）
 - TreeSetはNavigableSetで受けたほうが良いのかな
 
-少しドキュメントを見たりして書き直す。
-- `comparingInt`を使うと型推論が効いてくれる
-- Stream.limitを知った
+step 1の書き直し（ソートする方法）：
 ```java
 class Solution {
   public int[] topKFrequent(int[] nums, int k) {
@@ -117,6 +123,32 @@ class Solution {
       ++index;
     }
     return result;
+  }
+}
+```
+
+## 清書
+せっかくなので、TreeSetを使う方法で覚えてみよう。
+```java
+class Solution {
+  public int[] topKFrequent(int[] nums, int k) {
+    Map<Integer, Integer> numToCount = new HashMap<>();
+    for (int num : nums) {
+      numToCount.merge(num, 1, Integer::sum);
+    }
+
+    Comparator<Integer> byCountThenNum = Comparator
+      .comparingInt((Integer num) -> numToCount.get(num))
+      .thenComparing(num -> num);
+    var countToNum = new TreeSet<Integer>(byCountThenNum);
+    for (Integer num : numToCount.keySet()) {
+      countToNum.add(num);
+      if (countToNum.size() > k) {
+        countToNum.pollFirst();
+      }
+    }
+
+    return countToNum.stream().mapToInt(Integer::intValue).toArray();
   }
 }
 ```
