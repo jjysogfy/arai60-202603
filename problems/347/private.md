@@ -140,15 +140,15 @@ class Solution {
     Comparator<Integer> byCountThenNum = Comparator
       .comparingInt((Integer num) -> numToCount.get(num))
       .thenComparing(num -> num);
-    var countToNum = new TreeSet<Integer>(byCountThenNum);
+    var sortedNums = new TreeSet<Integer>(byCountThenNum);
     for (Integer num : numToCount.keySet()) {
-      countToNum.add(num);
-      if (countToNum.size() > k) {
-        countToNum.pollFirst();
+      sortedNums.add(num);
+      if (sortedNums.size() > k) {
+        sortedNums.pollFirst();
       }
     }
 
-    return countToNum.stream().mapToInt(Integer::intValue).toArray();
+    return sortedNums.stream().mapToInt(Integer::intValue).toArray();
   }
 }
 ```
