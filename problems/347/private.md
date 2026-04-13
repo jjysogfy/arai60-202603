@@ -152,3 +152,9 @@ class Solution {
   }
 }
 ```
+
+- `TreeSet<>`とIntegerは省略できるが、そのまま書いておく
+- 変数名、sortedNumsよりtopKNumsのほうが良いかも？
+
+# step 3
+6分半ぐらいで書けるようになった。
