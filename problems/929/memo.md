@@ -193,3 +193,35 @@ class Solution {
 - 最低でも週2（土日）は進める
 - 次の問題：https://leetcode.com/problems/first-unique-character-in-a-string/
 
+
+# step 4
+レビューを反映。
+```java
+// 2文に分けてみる
+  public static String canonicalize(String email) {
+    String[] splitEmail = email.split("@", 2);
+    String localName = splitEmail[0];
+    String domainName = splitEmail[1];
+
+    String formattedLocalName = localName.split("\\+", 2)[0];
+    formattedLocalName = formattedLocalName.replaceAll("\\.", "");
+    return formattedLocalName + "@" + domainName;
+  }
+```
+
+- `formattedLocalName`変数を使い回すのが良いのかわからない
+  - 良い変数名が思いつかないし、このほうがわかりやすい気がする
+
+```java
+// 正規表現にコメントを付けてみる
+  public String canonicalize(String email) {
+    String formatted = email
+      // '@' より前にある '.' にマッチ
+      // 例： "ab.c@example.com" -> "abc@example.com"
+      .replaceAll("\\.(?=.*@)", "")
+      // '+' から '@' まで（'+' を含み '@' を含まない）にマッチ
+      // 例： "ab+c@example.com" -> "ab@example.com"
+      .replaceAll("\\+.*(?=@)", "");
+    return formatted;
+  }
+```
