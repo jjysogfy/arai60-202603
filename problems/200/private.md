@@ -60,7 +60,7 @@ class Solution {
 - DFS
 - `p`が範囲内の点か、などチェックするタイミング？
   - ループのはじめでチェックしてみた
-  - `push`するとき（ループの最後）でも良いが、Javaでどう書くのが簡単かわからない
+  - stackに`push`するとき（ループの最後）でも良いが、Javaでどう書くのが簡単かわからない
 
 
 # step 2
@@ -83,7 +83,7 @@ Javaでたくさん解いている方々
   - ArrayDequeなど、Javaの練習にもなりそう
 - しかし、時間を取りすぎるので、step 1の方針のままやってみる
 - 範囲の条件をpush時にチェックするようにはしておきたい
-  - Javaだと、こういうlambdaは書きづらそう（lambdaの型を指定しないといけない）
+  - Javaだと、こういうlambdaは書きづらそう
   - かといってメソッドにすると、引数が増えてちょっと邪魔くさい
   - deltaを用意するのが良いか
 
@@ -157,9 +157,13 @@ class Solution {
 - チェックを、stackにpushする前に行う
   - `traverse`の引数もチェックしたいと思ったが、コードが重複してしまう……
 - Positionの変数名`position`と`toVisit`はかなり悩む……
+- なんとなく見た目にゴチャゴチャした印象。`pushIfLand`メソッドを書くほうが良い？
 - 他：
   - goto-untrapped氏を参考に、Point -> Position
   - traverseの引数にheight, widthを渡すのはそんなに気持ちよくない感じがしたので、やめた
   - DFSに使うstackの変数名は？ goto-untrapped氏はconnected。なるほど、操作より意味を見てる感じ
     - 今回は、別の人が使っていたlandsToVisitとしてみた（たとえば https://github.com/quinn-sasha/leetcode/pull/18/changes ）
+
+
+# step 3
 
