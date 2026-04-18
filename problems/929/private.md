@@ -68,3 +68,28 @@ class Solution {
 }
 ```
 
+
+2週間経って、解き直したコード：
+```java
+class Solution {
+  public int numUniqueEmails(String[] emails) {
+    Set<String> canonicalizedEmails = new HashSet<>();
+    for (String email : emails) {
+      canonicalizedEmails.add(canonicalize(email));
+    }
+    return canonicalizedEmails.size();
+  }
+
+  private String canonicalize(String email) {
+    String[] splitEmail = email.split("@", 2);
+    String localName = splitEmail[0];
+    String domainName = splitEmail[1];
+
+    String canonicalizedLocalName = localName
+      .split("\\+", 2)[0]
+      .replaceAll("\\.", "");
+
+    return canonicalizedLocalName + "@" + domainName;
+  }
+}
+```
