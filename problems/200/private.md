@@ -54,21 +54,18 @@ class Solution {
 }
 ```
 
-- 解いたことがある
+- 取り組んだことがある
 - 30分かかったが、一発でちゃんと通った
   - Javaについて調べたりしつつだった（2D配列の初期化、record型など）
 - DFS
-- `p`がgrid内の点か、などのチェックをするタイミングについて
+- `p`が範囲内の点か、などチェックするタイミング？
   - ループのはじめでチェックしてみた
-  - `push`するときでも良いが、Javaでどう書くのが簡単かわからない
+  - `push`するとき（ループの最後）でも良いが、Javaでどう書くのが簡単かわからない
 
 
 # step 2
-コメント集と、Javaでたくさん解いた人のコードを見る。
-
-- UnionFind
-- BFS
-- 「（前略）…とはいえメソッドなので、雑に扱っても構わないものにしておきたい気持ちがあるんです。」
+コメント集
+- 「（前略）とはいえメソッドなので、雑に扱っても構わないものにしておきたい気持ちがあるんです。」
   - https://discord.com/channels/1084280443945353267/1227073733844406343/1234185601993932891
 - 範囲チェックの方法について
   - 「ここの部分は先にチェックするか一回 queue に入れて、後からチェックするかでしょう。」「上下左右方向の座標の差分を表す配列と、範囲外にアクセスしようとしているかどうかを判定する関数を用意し、ループで方向を回して処理したほうが」
@@ -77,7 +74,7 @@ class Solution {
   - https://github.com/rimokem/arai60/pull/17
 - https://github.com/attractal/leetcode/pull/8
 
-Javaの方
+Javaでたくさん解いている方々
 - https://github.com/goto-untrapped/Arai60/pull/38/changes
 - https://github.com/ryoooooory/LeetCode/pull/2/changes
 
@@ -89,4 +86,80 @@ Javaの方
   - Javaだと、こういうlambdaは書きづらそう（lambdaの型を指定しないといけない）
   - かといってメソッドにすると、引数が増えてちょっと邪魔くさい
   - deltaを用意するのが良いか
+
+## 清書
+```java
+class Solution {
+  static final char WATER = '0';
+  static final char LAND = '1';
+
+  public int numIslands(char[][] grid) {
+    int result = 0;
+    int height = grid.length;
+    int width = grid[0].length;
+    boolean[][] isVisited = new boolean[height][width];
+
+    for (int row = 0; row < height; ++row) {
+      for (int col = 0; col < width; ++col) {
+        if (grid[row][col] != LAND || isVisited[row][col]) {
+          continue;
+        }
+        traverse(grid, row, col, isVisited);
+        ++result;
+      }
+    }
+    return result;
+  }
+
+  private void traverse(char[][] grid, int startRow, int startCol, boolean[][] isVisited) {
+    int height = grid.length;
+    int width = grid[0].length;
+    ArrayDeque<Point> landsToVisit = new ArrayDeque<>();
+    landsToVisit.push(new Point(startRow, startCol));
+
+    while (!landsToVisit.isEmpty()) {
+      Position position = landsToVisit.pop();
+      if (isVisited[position.row()][position.col()]) {
+        continue;
+      }
+      isVisited[position.row()][position.col()] = true;
+
+      List<Position> directions = List.of(
+        new Position(1, 0), new Position(-1, 0), new Position(0, 1), new Position(0, -1)
+      );
+      for (Position d : directions) {
+        Position toVisit = new Position(position.row() + d.row(), position.col() + d.col());
+        if (!isInRectangle(height, width, toVisit)) {
+          continue;
+        }
+        if (grid[toVisit.row()][toVisit.col()] != LAND) {
+          continue;
+        }
+        if (isVisited[toVisit.row()][toVisit.col()]) {
+          continue
+        }
+
+        landsToVisit.push(toVisit);
+      }
+    }
+
+    private boolean isInRectangle(int height, int width, Position p) {
+      return 0 <= p.row() && p.row() < height
+        && 0 <= p.col() && p.col() < width;
+    }
+  }
+
+  private record Position(int row, int col) {}
+}
+```
+
+- goto-untrapped氏を参考にした
+- チェックを、stackにpushする前に行う
+  - `traverse`の引数もチェックしたいと思ったが、コードが重複してしまう……
+- Positionの変数名`position`と`toVisit`はかなり悩む……
+- 他：
+  - goto-untrapped氏を参考に、Point -> Position
+  - traverseの引数にheight, widthを渡すのはそんなに気持ちよくない感じがしたので、やめた
+  - DFSに使うstackの変数名は？ goto-untrapped氏はconnected。なるほど、操作より意味を見てる感じ
+    - 今回は、別の人が使っていたlandsToVisitとしてみた（たとえば https://github.com/quinn-sasha/leetcode/pull/18/changes ）
 
