@@ -58,7 +58,7 @@ class Solution {
 - 30分かかったが、一発でちゃんと通った
   - Javaについて調べたりしつつだった（2D配列の初期化、record型など）
 - DFS
-- `p`が範囲内の点か、などチェックするタイミング？
+- 迷ったところ：`p`が範囲内の点か、などチェックするタイミング？
   - ループのはじめでチェックしてみた
   - stackに`push`するとき（ループの最後）でも良いが、Javaでどう書くのが簡単かわからない
 
@@ -83,8 +83,8 @@ Javaでたくさん解いている方々
 - UnionFind、BFSなど、いろいろ書き方を試したくはある
   - ArrayDequeなど、Javaの練習にもなりそう
 - しかし、時間を取りすぎるので、step 1の方針のままやってみる
-- 範囲の条件をpush時にチェックするようにはしておきたい
-  - Javaだと、こういうlambdaは書きづらそう
+- 範囲の条件を、stackに`push`するとき（ループの最後）チェックするようにはしておきたい
+  - Javaだと、チェックしてpushするlambdaは書きづらそう
   - かといってメソッドにすると、引数が増えてちょっと邪魔くさい
   - deltaを用意するのが良いか
 
@@ -155,17 +155,81 @@ class Solution {
 ```
 
 - goto-untrapped氏を参考にした
-- 範囲チェックを、stackにpushする前に行う
-  - コメントを見て、`traverse`の（仮）引数も範囲チェックしたいと思ったが、コードの重複も増えるし今回は気が進まない
+- 範囲チェックを、stackにpushするときに行う
+  - コメントを見て、`traverse`メソッドの（仮）引数も範囲チェックしたいと思ったが、コードの重複も増えるし今回は気が進まない
 - Positionの変数名`position`と`toVisit`はかなり悩む……
-- なんとなく見た目にゴチャゴチャした印象。`pushIfLand`メソッドを書くほうが良い？
+- なんとなく見た目にゴチャゴチャした印象。`pushIfLand(grid, isVisited, row, col)`メソッドを書くほうが良い？
 - 他：
-  - goto-untrapped氏を参考に、Point -> Position
-  - traverseの引数にheight, widthを渡すのはそんなに気持ちよくない感じがしたので、やめた
-  - DFSに使うstackの変数名は？ goto-untrapped氏はconnected。なるほど、操作より意味を見てる感じ
+  - 変数名：goto-untrapped氏を参考に、Point -> Position
+  - step 1ではtraverseの引数にheight, widthを含めたが、そんなに気持ちよくない感じがしたのでやめた
+  - 変数名：DFSに使うstackの変数名は？ goto-untrapped氏はconnected。なるほど、操作より意味を見てる感じ（？）
     - 今回は、別の人が使っていたlandsToVisitとしてみた（たとえば https://github.com/quinn-sasha/leetcode/pull/18/changes ）
 
 
 # step 3
-1回目（ミス）：15分、2回目（ミス）：11:45、3回目：12:53、4回目：7:43
+1回目（ミス）：15分、2回目（ミス）：11:45、3回目：12:53、4回目：7:43、5回目：7:47
 
+- 少し時間は10分に収まってないが、今回はこれで良しとしておく。
+- `directions`をループの外に出して、変数名を変更してみた
+  - これなら一文字変数`p`もそんなに悪くないと、個人的には感じる
+
+```java
+class Solution {
+  static final char LAND = '1';
+
+  public int numIslands(char[][] grid) {
+    int height = grid.length;
+    int width = grid[0].length;
+    boolean[][] isVisited = new boolean[height][width];
+
+    int result = 0;
+    for (int row = 0; row < height; ++row) {
+      for (int col = 0; col < width; ++col) {
+        if (grid[row][col] != LAND || isVisited[row][col]) {
+          continue;
+        }
+        traverse(grid, row, col, isVisited);
+        ++result;
+      }
+    }
+    return result;
+  }
+
+  private void traverse(char[][] grid, int startRow, int startCol, boolean[][] isVisited) {
+    int height = grid.length;
+    int width = grid[0].length;
+    var landsToVisit = new ArrayDeque<Position>();
+    landsToVisit.push(new Position(startRow, startCol));
+    List<Position> directions = List.of(
+      new Position(0, 1), new Position(0, -1), new Position(1, 0), new Position(-1, 0)
+    );
+
+    while (!landsToVisit.isEmpty()) {
+      Position p = landsToVisit.pop();
+      if (isVisited[p.row()][p.col()]) {
+        continue;
+      }
+      isVisited[p.row()][p.col()] = true;
+
+      for (Position direction : directions) {
+        Position toVisit = new Position(p.row() + direction.row(), p.col() + direction.col());
+        if (
+          !(0 <= toVisit.row() && toVisit.row() < height
+          && 0 <= toVisit.col() && toVisit.col() < width)
+        ) {
+          continue;
+        }
+        if (grid[toVisit.row()][toVisit.col()] != LAND) {
+          continue;
+        }
+        if (isVisited[toVisit.row()][toVisit.col()]) {
+          continue;
+        }
+        landsToVisit.push(toVisit);
+      }
+    }
+  }
+
+  record Position(int row, int col) {}
+}
+```
