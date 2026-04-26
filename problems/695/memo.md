@@ -166,3 +166,106 @@ class Solution {
 - 「UnionFind側の実装の都合が露出してしまってる」「union() に２つのセルのrow, columnを渡すというインターフェースにしたほうが」
   - https://github.com/hroc135/leetcode/pull/18#discussion_r1770740750
 
+
+```java
+// 清書（仮）
+class Solution {
+  static final int LAND = 1;
+
+  public static int maxAreaOfIsland(int[][] grid) {
+    int height = grid.length;
+    int width = grid[0].length;
+
+    UnionFind<Cell> islands = new UnionFind<>(height * width,
+        cell -> width * cell.row() + cell.col());
+
+    for (int row = 0; row < height; ++row) {
+      for (int col = 0; col < width; ++col) {
+        if (grid[row][col] != LAND) {
+          continue;
+        }
+        if (row + 1 < height && grid[row + 1][col] == LAND) {
+          islands.union(new Cell(row, col), new Cell(row + 1, col));
+        }
+        if (col + 1 < width && grid[row][col + 1] == LAND) {
+          islands.union(new Cell(row, col), new Cell(row, col + 1));
+        }
+      }
+    }
+
+    int maxArea = 0;
+    for (int row = 0; row < height; ++row) {
+      for (int col = 0; col < width; ++col) {
+        if (grid[row][col] != LAND) {
+          continue;
+        }
+        int area = islands.sizeOfComponent(new Cell(row, col));
+        maxArea = Math.max(maxArea, area);
+      }
+    }
+    return maxArea;
+  }
+
+  record Cell(int row, int col) {
+  }
+}
+
+class UnionFind<T> {
+  private int size;
+  private int[] parents;
+  private int[] sizes;
+  public final ToIntFunction<T> itemToIndex;
+
+  public UnionFind(int size, ToIntFunction<T> itemToIndex) {
+    this.size = size;
+    this.parents = IntStream.range(0, size).toArray();
+    this.sizes = new int[size];
+    Arrays.fill(this.sizes, 1);
+    this.itemToIndex = itemToIndex;
+  }
+
+  public int size() {
+    return this.size;
+  }
+
+  public int sizeOfComponent(T x) {
+    int root = find(x);
+    return this.sizes[root];
+  }
+
+  public int find(T x) {
+    int index = itemToIndex.applyAsInt(x);
+    return findFromIndex(index);
+  }
+
+  private int findFromIndex(int index) {
+    int parent = this.parents[index];
+    if (parent == index) {
+      return index;
+    }
+    int root = findFromIndex(parent);
+    this.parents[index] = root;
+    return root;
+  }
+
+  public void union(T x, T y) {
+    int rootX = find(x);
+    int rootY = find(y);
+    if (rootX == rootY) {
+      return;
+    }
+    int smaller;
+    int larger;
+    if (this.sizes[rootX] <= this.sizes[rootY]) {
+      smaller = rootX;
+      larger = rootY;
+    } else {
+      smaller = rootY;
+      larger = rootX;
+    }
+    this.parents[smaller] = larger;
+    this.sizes[larger] += this.sizes[smaller];
+  }
+}
+```
+
