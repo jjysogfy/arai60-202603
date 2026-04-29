@@ -167,8 +167,10 @@ class Solution {
   - https://github.com/hroc135/leetcode/pull/18#discussion_r1770740750
 
 
+## 清書
+せっかくなのでUnion-findでやってみる。
+
 ```java
-// 清書（仮）
 class Solution {
   static final int LAND = 1;
 
@@ -268,4 +270,18 @@ class UnionFind<T> {
   }
 }
 ```
+
+
+# step 3
+1回目（ミスあり）：19分半、2回目（ミスあり）:17分、3回目（ミスあり）：18分
+4回目（ミスあり）：11分、5回目（ミスあり）：12分
+
+バグらせたところ
+- maxAreaOfIslandの1回目のループで、`== LAND`を`!= LAND`と書いた
+- 2回目のループで`!= LAND`チェックを忘れた
+  - このUnionFindはWATERもサイズ1と扱ってしまう
+- return忘れ
+- `UnionFind<Cell> islands`の宣言忘れ
+- `find`の呼び出しを`findByIndex`と書いた
+- スペルミス（sizesをsizeと書いた）
 
