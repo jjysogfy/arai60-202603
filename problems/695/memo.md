@@ -156,7 +156,7 @@ class Solution {
 ```
 
 - 13分。`return area;`忘れで1ミス
-- （このようにキューから取り出すときにseenなどチェックするほうがコードが短いが、キューに追加する前にチェックしたほうが挙動は自然な気もする）
+- （このようにキューから取り出すときにseenなどチェックするほうがコードが短いが、キューに追加する前にチェックしたほうが動作は自然な気もする）
 - どこにprivate/staticを付けるかは悩む
 
 
@@ -276,15 +276,19 @@ class UnionFind<T> {
 
 # step 3
 1回目（ミスあり）：19分半、2回目（ミスあり）:17分、3回目（ミスあり）：18分、
-4回目（ミスあり）：11分、5回目（ミスあり）：12分、6回目（ミスあり）：13分
+4回目（ミスあり）：11分、5回目（ミスあり）：12分、6回目（ミスあり）：13分、
+7回目：12分半、8回目：15分以内
+
+コードが長いこともあり、ちょっと基準をゆるめて、このあたりでやめる。
 
 バグらせたところ
 - maxAreaOfIslandの1回目のループで、`== LAND`を`!= LAND`と書いた
 - 2回目のループで`!= LAND`チェックを忘れた
   - このUnionFindはWATERもサイズ1と扱ってしまう
+  - だから、`!= LAND`チェックを忘れるとWATERしかない場合にバグる
   - ここ、UnionFindの実装を変える手もあるが、ちょっと複雑になりそうなので、とりあえずやめておく
 - return忘れ
-- `UnionFind<Cell> islands`の宣言忘れ
+- 変数`UnionFind<Cell> islands`の宣言忘れ
 - `new UnionFind<>()`の`<>`忘れ
   - raw type `new UnionFind()`だと、引数のlambdaで型エラーが出る
 - `find`の呼び出しを`findByIndex`と書いた
@@ -292,4 +296,94 @@ class UnionFind<T> {
 - `union`で`sizes[ ]`付け忘れ（`sizes[larger] += smaller;`）
 - ミスはしていないが、`union`で`parents[smaller] = larger;`を書くのにちょっと時間がかかる
   - `sizes`の更新と、あとひとつ何をするんだっけ、みたいに考えてしまう
+- ミスではないが、`static record`と書いてしまった。`static`は無くていい
 
+```java
+// step 3
+class Solution {
+  private static final int LAND = 1;
+
+  private record Cell(int row, int col) {
+    public static Cell of(int row, int col) {
+      return new Cell(row, col);
+    }
+  }
+
+  public int maxAreaOfIsland(int[][] grid) {
+    int height = grid.length;
+    int width = grid[0].length;
+    UnionFind<Cell> components = new UnionFind<>(height * width,
+        cell -> width * cell.row() + cell.col());
+
+    for (int row = 0; row < height; ++row) {
+      for (int col = 0; col < width; ++col) {
+        if (row + 1 < height && grid[row][col] == LAND && grid[row + 1][col] == LAND) {
+          components.union(Cell.of(row, col), Cell.of(row + 1, col));
+        }
+        if (col + 1 < width && grid[row][col] == LAND && grid[row][col + 1] == LAND) {
+          components.union(Cell.of(row, col), Cell.of(row, col + 1));
+        }
+      }
+    }
+
+    int maxArea = 0;
+    for (int row = 0; row < height; ++row) {
+      for (int col = 0; col < width; ++col) {
+        if (grid[row][col] != LAND) {
+          continue;
+        }
+        int area = components.getComponentSize(Cell.of(row, col));
+        maxArea = Math.max(maxArea, area);
+      }
+    }
+    return maxArea;
+  }
+}
+
+class UnionFind<T> {
+  private final int[] parents;
+  private final int[] sizes;
+  private final ToIntFunction<T> indexByItem;
+
+  public UnionFind(int size, ToIntFunction<T> indexByItem) {
+    this.indexByItem = indexByItem;
+    this.parents = IntStream.range(0, size).toArray();
+    this.sizes = new int[size];
+    Arrays.fill(this.sizes, 1);
+  }
+
+  public int getComponentSize(T item) {
+    int root = find(item);
+    return sizes[root];
+  }
+
+  public int find(T item) {
+    int index = indexByItem.applyAsInt(item);
+    return findByIndex(index);
+  }
+
+  private int findByIndex(int index) {
+    if (parents[index] == index) {
+      return index;
+    }
+    return parents[index] = findByIndex(parents[index]);
+  }
+
+  public void union(T item1, T item2) {
+    int root1 = find(item1);
+    int root2 = find(item2);
+    if (root1 == root2) {
+      return;
+    }
+    int smaller = root1;
+    int larger = root2;
+    if (sizes[smaller] > sizes[larger]) {
+      int tmp = smaller;
+      smaller = larger;
+      larger = tmp;
+    }
+    parents[smaller] = larger;
+    sizes[larger] += sizes[smaller];
+  }
+}
+```
