@@ -2,6 +2,7 @@
 
 # step 1
 ```java
+// step 1 その1 Union-Find
 class Solution {
   static final int LAND = 1;
 
@@ -101,7 +102,7 @@ class UnionFind {
 - BFSも書いておく
 
 ```java
-// step 1の二つ目のコード
+// step 1 その2 BFS
 class Solution {
   static final int LAND = 1;
 
@@ -171,6 +172,7 @@ class Solution {
 せっかくなのでUnion-findでやってみる。
 
 ```java
+// step 2 清書
 class Solution {
   static final int LAND = 1;
 
@@ -273,15 +275,21 @@ class UnionFind<T> {
 
 
 # step 3
-1回目（ミスあり）：19分半、2回目（ミスあり）:17分、3回目（ミスあり）：18分
-4回目（ミスあり）：11分、5回目（ミスあり）：12分
+1回目（ミスあり）：19分半、2回目（ミスあり）:17分、3回目（ミスあり）：18分、
+4回目（ミスあり）：11分、5回目（ミスあり）：12分、6回目（ミスあり）：13分
 
 バグらせたところ
 - maxAreaOfIslandの1回目のループで、`== LAND`を`!= LAND`と書いた
 - 2回目のループで`!= LAND`チェックを忘れた
   - このUnionFindはWATERもサイズ1と扱ってしまう
+  - ここ、UnionFindの実装を変える手もあるが、ちょっと複雑になりそうなので、とりあえずやめておく
 - return忘れ
 - `UnionFind<Cell> islands`の宣言忘れ
+- `new UnionFind<>()`の`<>`忘れ
+  - raw type `new UnionFind()`だと、引数のlambdaで型エラーが出る
 - `find`の呼び出しを`findByIndex`と書いた
 - スペルミス（sizesをsizeと書いた）
+- `union`で`sizes[ ]`付け忘れ（`sizes[larger] += smaller;`）
+- ミスはしていないが、`union`で`parents[smaller] = larger;`を書くのにちょっと時間がかかる
+  - `sizes`の更新と、あとひとつ何をするんだっけ、みたいに考えてしまう
 
