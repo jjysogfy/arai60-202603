@@ -100,12 +100,19 @@ class Solution {
 - https://github.com/hayashi-ay/leetcode/pull/42
   - https://discord.com/channels/1084280443945353267/1200089668901937312/1215117909450424410
 
+- https://github.com/goto-untrapped/Arai60/pull/57
+- https://github.com/ryoooooory/LeetCode/pull/23
+
 気づいたこと
 - `"h*t"` -> `["hot", "hat"]`のような辞書を作る方法
   - 賢い。グラフが特殊な形なのを利用して、効率的に隣接リストを表現してる感じ
   - step 1のコードでいう`alteredAt(word, i, c)`を`c`ごとに計算しなくてよくなる
   - 計算量が`word.length`倍改善する
   - 変数ALPHABETSを持ち出さなくていいのも良い
+- 入力に`'*'`が入ると困る、という意見
+  - `("h", "t")`のようなtupleを使う
+  - Javaだとrecordが良いか
+  - ワイルドカードという感じ。`'?'`, `'_'`などのほうがもう少し慣例的？
 - 素直にwordListの二重ループで隣接リストを作るのが自然、という考え
   - https://github.com/hayashi-ay/leetcode/pull/42
   - 遅くはなる。Pythonだと間に合わないこともあるらしい
@@ -118,4 +125,78 @@ class Solution {
 - 語の隣接リストはより高速に計算できるらしい？
   - https://discord.com/channels/1084280443945353267/1200089668901937312/1216123084889788486
   - 面白そうだけど、時間もかかりそうなので、頭の片隅に入れておきつつ放置
+- 「頭から半分または尻尾から半分が一致しているはずなので、それでバケットを作ってバケット内でのみ比較すればいいというやりかたもありますね。」
+  - これはよく理解できてない
+- 4重ループだと、ネストが深いので関数化すべき、という感覚らしい
+  - https://github.com/ryoooooory/LeetCode/pull/23
+  - step 1のコードは3重ループで済んでいるが、キューを2つ持つBFSの書き方だと4重になる
+- 隣接リストに添字を持たせて`Map<String, List<Integer>>`とする手もある
+  - https://github.com/goto-untrapped/Arai60/pull/57
+
+
+## 清書
+```java
+// step 2 清書 `"h*t"` -> `["hot", "hat"]`のような辞書を作る方法
+public class Solution {
+  public int ladderLength(String beginWord, String endWord, List<String> wordList) {
+    Map<String, List<String>> adjacency = buildGraph(beginWord, wordList);
+
+    List<String> words = new ArrayList<>();
+    words.add(beginWord);
+    Set<String> visited = new HashSet<>();
+    visited.add(beginWord);
+    int length = 1;
+    while (!words.isEmpty()) {
+      List<String> nextWords = new ArrayList<>();
+      for (String word : words) {
+        if (word.equals(endWord)) {
+          return length;
+        }
+        addNeighbors(adjacency, word, nextWords, visited);
+      }
+
+      words = nextWords;
+      ++length;
+    }
+
+    return 0; // no ladder exists
+  }
+
+  String buildPattern(String word, int i) {
+    char[] wordArray = word.toCharArray();
+    wordArray[i] = '*';
+    return new String(wordArray);
+  }
+
+  Map<String, List<String>> buildGraph(String beginWord, List<String> wordList) {
+    Map<String, List<String>> adjacency = new HashMap<>();
+    List<String> words = new ArrayList<>(wordList);
+    if (!wordList.contains(beginWord)) {
+      words.add(beginWord);
+    }
+    for (String word : words) {
+      for (int i = 0; i < word.length(); ++i) {
+        String pattern = buildPattern(word, i);
+        adjacency.computeIfAbsent(pattern, p -> new ArrayList<>())
+            .add(word);
+      }
+    }
+    return adjacency;
+  }
+
+  void addNeighbors(Map<String, List<String>> adjacency,
+      String word, List<String> nextWords, Set<String> visited) {
+    for (int i = 0; i < word.length(); ++i) {
+      for (String nextWord : adjacency.get(buildPattern(word, i))) {
+        if (visited.contains(nextWord)) {
+          continue;
+        }
+        visited.add(nextWord);
+        nextWords.add(nextWord);
+      }
+    }
+  }
+}
+// step 2 清書 終わり
+```
 
