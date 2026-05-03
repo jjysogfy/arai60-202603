@@ -1,5 +1,10 @@
 問題（127. Word Ladder）：https://leetcode.com/problems/word-ladder/
 
+# ファイル構成
+この`memo.md`のコードを主にレビューしていただきたいです。
+（ファイルが長くなりすぎないよう、一部は別ファイル`side_notes.md`としました。）
+
+
 # step 1
 ```java
 // step 1のコード
@@ -69,12 +74,8 @@ class Solution {
 - 思ったこといくつか：
 - ALPHABETSの初期化は、あまり上手くない気がする
   - 1行で簡単に書きたかったが、思いつかずやめた
-    - IntStreamはあるがCharStreamはない
-    - 追記：サロゲートペアを考えると、`char[]`より`int[]`にすべきで、それなら書けるかも
+    - 追記：`char[]`でなく`int[]`や`String[]`にする手がある
     - 追記：`int[] ALPHABETS = IntStream.rangeClosed('a', 'z').toArray()`
-    - 追記：`alteredAt`も変更が必要。`c`の代わりに`Character.toString(c)`とするなど
-    - 追記：ただ、実際にサロゲートペアがあると`ladderLength`自体は壊れそう
-    - 追記：`String[] ALPHABETS`という手もあるか
   - static初期化ブロックを初めて使った
 - WordAndNumまわりの変数名は迷った
   - はじめ`Queue<WordAndNum> wordsToVisit`を`Queue<String>`で書いていた
@@ -83,9 +84,9 @@ class Solution {
   - ステップ数はだいたい、`wordList.length * ALPHABETS.length * word.length^2`
     - つまり`10^5 * 10^2`ぐらい
     - nextWordの計算で`word.length`がひとつ掛かると思う
-  - Javaは1秒`10^6`から`10^7`程度
-    - 追記：覚え間違い！ `10^7`から`10^8`程度。クロック周波数が`1G=10^9`オーダーで、そこから1、2桁落ちる
-  - `10^7`ステップだと危ういなあと思いつつ書いていた
+  - 追記：Javaは1秒`10^7`から`10^8`程度。クロック周波数が`1G=10^9`オーダーで、そこから1、2桁落ちる
+    - （覚え間違いで、`10^6`から`10^7`程度と思っていた）
+    - （`10^7`ステップだと危ういなあと思いつつ書いていた）
   - 結果は272ms
 - あとAIにレビューさせて気づいたことだが、ALPHABETSの変数名は単数形のほうが自然かも
 
@@ -109,9 +110,8 @@ class Solution {
   - step 1のコードでいう`alteredAt(word, i, c)`を`c`ごとに計算しなくてよくなる
   - 計算量が`word.length`倍改善する
   - 変数ALPHABETSを持ち出さなくていいのも良い
-- 入力に`'*'`が入ると困る、という意見
-  - `("h", "t")`のようなtupleを使う
-  - Javaだとrecordが良いか
+  - 入力に`'*'`が入ると困る、という意見
+    - `("h", "t")`のようなtupleを使う手。Javaだとrecordが良いか
   - ワイルドカードという感じ。`'?'`, `'_'`などのほうがもう少し慣例的？
 - 素直にwordListの二重ループで隣接リストを作るのが自然、という考え
   - https://github.com/hayashi-ay/leetcode/pull/42
@@ -130,73 +130,17 @@ class Solution {
 - 4重ループだと、ネストが深いので関数化すべき、という感覚らしい
   - https://github.com/ryoooooory/LeetCode/pull/23
   - step 1のコードは3重ループで済んでいるが、キューを2つ持つBFSの書き方だと4重になる
-- 隣接リストに添字を持たせて`Map<String, List<Integer>>`とする手もある
+- 添字を持たせる隣接リスト`Map<String, List<Integer>>`を使う手もある
   - https://github.com/goto-untrapped/Arai60/pull/57
+  - 高速化が期待できる
 
 
 ## 清書
-```java
-// step 2 清書 `"h*t"` -> `["hot", "hat"]`のような辞書を作る方法
-public class Solution {
-  public int ladderLength(String beginWord, String endWord, List<String> wordList) {
-    Map<String, List<String>> adjacency = buildGraph(beginWord, wordList);
+- `"h*t"` -> `["hot", "hat"]`のような辞書を作る方法で清書
+  - いきなり思いつかなくてもいい方法みたいだけど、せっかくなので
+- コードは、step 3と被るし長めなので`side_notes.md`に載せた
+  - `side_notes.md`には他の方法のコードも載せておいた
 
-    List<String> words = new ArrayList<>();
-    words.add(beginWord);
-    Set<String> visited = new HashSet<>();
-    visited.add(beginWord);
-    int length = 1;
-    while (!words.isEmpty()) {
-      List<String> nextWords = new ArrayList<>();
-      for (String word : words) {
-        if (word.equals(endWord)) {
-          return length;
-        }
-        addNeighbors(adjacency, word, nextWords, visited);
-      }
 
-      words = nextWords;
-      ++length;
-    }
-
-    return 0; // no ladder exists
-  }
-
-  String buildPattern(String word, int i) {
-    char[] wordArray = word.toCharArray();
-    wordArray[i] = '*';
-    return new String(wordArray);
-  }
-
-  Map<String, List<String>> buildGraph(String beginWord, List<String> wordList) {
-    Map<String, List<String>> adjacency = new HashMap<>();
-    List<String> words = new ArrayList<>(wordList);
-    if (!wordList.contains(beginWord)) {
-      words.add(beginWord);
-    }
-    for (String word : words) {
-      for (int i = 0; i < word.length(); ++i) {
-        String pattern = buildPattern(word, i);
-        adjacency.computeIfAbsent(pattern, p -> new ArrayList<>())
-            .add(word);
-      }
-    }
-    return adjacency;
-  }
-
-  void addNeighbors(Map<String, List<String>> adjacency,
-      String word, List<String> nextWords, Set<String> visited) {
-    for (int i = 0; i < word.length(); ++i) {
-      for (String nextWord : adjacency.get(buildPattern(word, i))) {
-        if (visited.contains(nextWord)) {
-          continue;
-        }
-        visited.add(nextWord);
-        nextWords.add(nextWord);
-      }
-    }
-  }
-}
-// step 2 清書 終わり
-```
+# step 3
 
