@@ -233,3 +233,65 @@ class Solution {
   record Position(int row, int col) {}
 }
 ```
+
+
+# step 4
+時間を置いてから、見ないで書いてみる。レビューも念頭に。
+
+時間は8:50ぐらい。
+
+```java
+public class Solution {
+  static final char LAND = '1';
+
+  public int numIslands(char[][] grid) {
+    int height = grid.length;
+    int width = grid[0].length;
+    boolean[][] visited = new boolean[height][width];
+
+    int result = 0;
+    for (int row = 0; row < height; ++row) {
+      for (int col = 0; col < width; ++col) {
+        if (grid[row][col] != LAND || visited[row][col]) {
+          continue;
+        }
+        ++result;
+        traverse(grid, row, col, visited);
+      }
+    }
+    return result;
+  }
+
+  public record Cell(int row, int col) {
+  }
+
+  void traverse(char[][] grid, int startRow, int startCol, boolean[][] visited) {
+    int height = grid.length;
+    int width = grid[0].length;
+    Deque<Cell> cellsToVisit = new ArrayDeque<>();
+    cellsToVisit.push(new Cell(startRow, startCol));
+
+    while (!cellsToVisit.isEmpty()) {
+      Cell cell = cellsToVisit.pop();
+      if (!(0 <= cell.row() && cell.row() < height && 0 <= cell.col() && cell.col() < width)) {
+        continue;
+      }
+      if (grid[cell.row()][cell.col()] != LAND) {
+        continue;
+      }
+      if (visited[cell.row()][cell.col()]) {
+        continue;
+      }
+      visited[cell.row()][cell.col()] = true;
+
+      cellsToVisit.push(new Cell(cell.row() + 1, cell.col()));
+      cellsToVisit.push(new Cell(cell.row() - 1, cell.col()));
+      cellsToVisit.push(new Cell(cell.row(), cell.col() + 1));
+      cellsToVisit.push(new Cell(cell.row(), cell.col() - 1));
+    }
+  }
+}
+```
+
+- 結局、popしたあとに範囲チェックするコードに。step 1と同じ。これだとコードが短くはなる。
+- レビューを反映し、変数名はisVisitedではなくvisitedに直した
