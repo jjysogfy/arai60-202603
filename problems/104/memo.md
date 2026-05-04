@@ -1,8 +1,7 @@
 問題（104. Maximum Depth of Binary Tree）：https://leetcode.com/problems/maximum-depth-of-binary-tree/
 
 # ファイル構成
-`memo.md`のコードをレビューしてくだされば幸いです。
-ファイルが長くなりすぎないよう、一部を別ファイル`side_notes.md`に分離しました。
+このファイル`memo.md`のコードをレビューしてくだされば幸いです。
 
 
 # step 1
@@ -71,20 +70,22 @@ class Solution {
 - https://discord.com/channels/1084280443945353267/1233603535862628432/1278690571132604460
   - https://github.com/goto-untrapped/Arai60/pull/45/changes
   - JavaのQueue vs Deque vs ArrayDeque (vs LinkedList)
-  - add/remove、offer/pollはQueueのメソッド
-    - 実装を見る限り、このどちらを使ってもArrayDequeでは同じ
+  - add/remove、offer/pollはインターフェイスQueueのメソッド
+    - 実装を見る限り、ArrayDequeではadd=offer、remove=poll
       - https://github.com/openjdk/jdk/blob/master/src/java.base/share/classes/java/util/ArrayDeque.java
-    - 要素数が制限されたキュー（そういうものがあるらしい）では挙動が違う。例外か、特別な値が返るか
+    - 要素数が制限されたキュー（そういうものがあるらしい）では挙動が違う
+      - 要素数を超えるとき、例外が出るか、特別な値が返るか
       - https://docs.oracle.com/en/java/javase/26/docs/api/java.base/java/util/Queue.html
   - DequeはQueueのサブ・インターフェイス。addFirst/addLastなどを持つ
     - スタックとして使うために、push/popも持つ
   - 「ArrayDequeはnullを処理せず、例外を投げる。LinkedListはnullも格納できる。」とのこと
+    - うっかりnullをpushして例外が出ちゃうとか、やりそうなので気をつけたい
 - https://discord.com/channels/1084280443945353267/1227073733844406343/1236235351140339742
   - 再帰 vs スタックを使うループ
   - C++だと参照型を使ってもっと見やすく書ける
     - https://discord.com/channels/1084280443945353267/1227073733844406343/1236324993839792149
-    - 再帰関数でいえば、引数に参照を渡して返り値の代わりにした感じ
-    - フラグも使わずに済む。どの再帰呼び出しの返り値がnon nullか、を使う感じ
+    - 引数として参照を渡して、返り値の代わりにした感じ
+    - フラグも使わずに済む。左と右、どの再帰呼び出しの返り値がnon nullか、を使う感じ
     - コードは`side_notes.md`に書いておく
 - 再帰はいくつか欠点があるとコメント集で見た気がして、若干避けている
   - スタックサイズの制限はある
