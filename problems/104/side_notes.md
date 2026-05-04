@@ -53,10 +53,11 @@ class Solution {
   - フラグを使わなくていい
   - https://discord.com/channels/1084280443945353267/1227073733844406343/1236324993839792149
 - intへの参照に相当するものが必要
-  - 今回は`List<Integer>`を使ってみた
-  - 前にコメント集で`AtomicInteger`というものを使っている人がいた気がする
+  - `List<Integer>`を使うコード、`AtomicInteger`を使うコードの2つを書いた
+    - `AtomicInteger`はコメント集でだけ見たことがあった。はじめて使った
 
 ```java
+// `List<Integer>`を参照として使う
 class Solution {
   // `List<Integer>` is used as a pointer to an `int` value
   record StackFrame(TreeNode node, List<Integer> returnValue,
@@ -99,3 +100,51 @@ class Solution {
   }
 }
 ```
+
+```java
+// `AtomicInteger`を参照として使う
+// nullの代わりに`UNDETERMINED = -1`を使う
+class Solution {
+  static final int UNDETERMINED = -1;
+
+  record StackFrame(TreeNode node, AtomicInteger returnValue,
+      AtomicInteger leftDepth, AtomicInteger rightDepth) {
+    static StackFrame of(TreeNode node, int returnValue) {
+      return new StackFrame(node, new AtomicInteger(returnValue),
+        new AtomicInteger(UNDETERMINED), new AtomicInteger(UNDETERMINED));
+    }
+
+    static StackFrame of(TreeNode node) {
+      return of(node, UNDETERMINED);
+    }
+  }
+
+  public int maxDepth(TreeNode root) {
+    List<StackFrame> stack =  new ArrayList<>();
+    StackFrame rootStackFrame = StackFrame.of(root);
+    stack.add(rootStackFrame);
+    while (!stack.isEmpty()) {
+      StackFrame top = stack.removeLast();
+      if (top.node() == null) {
+        top.returnValue().set(0);
+        continue;
+      }
+      if (top.leftDepth().get() == UNDETERMINED) {
+        stack.add(top);
+        stack.add(StackFrame.of(top.node().left, top.leftDepth().get()));
+        continue;
+      }
+      if (top.rightDepth().get() == UNDETERMINED) {
+        stack.add(top);
+        stack.add(StackFrame.of(top.node().right, top.rightDepth().get()));
+        continue;
+      }
+      int leftDepth = top.leftDepth().get();
+      int rightDepth = top.rightDepth().get();
+      top.returnValue().set(1 + Math.max(leftDepth, rightDepth));
+    }
+    return rootStackFrame.returnValue().get();
+  }
+}
+```
+

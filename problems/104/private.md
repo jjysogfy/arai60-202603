@@ -60,7 +60,8 @@ class Solution {
 # step 2
 コメント集を見る。
 - https://discord.com/channels/1084280443945353267/1233603535862628432/1278690571132604460
-  - JavaのQueue vs Deque vs ArrayDeque
+  - https://github.com/goto-untrapped/Arai60/pull/45/changes
+  - JavaのQueue vs Deque vs ArrayDeque (vs LinkedList)
   - add/remove、offer/pollはQueueのメソッド
     - 実装を見る限り、このどちらを使ってもArrayDequeでは同じ
       - https://github.com/openjdk/jdk/blob/master/src/java.base/share/classes/java/util/ArrayDeque.java
@@ -68,10 +69,52 @@ class Solution {
       - https://docs.oracle.com/en/java/javase/26/docs/api/java.base/java/util/Queue.html
   - DequeはQueueのサブ・インターフェイス。addFirst/addLastなどを持つ
     - スタックとして使うために、push/popも持つ
+  - 「ArrayDequeはnullを処理せず、例外を投げる。LinkedListはnullも格納できる。」とのこと
 - https://discord.com/channels/1084280443945353267/1227073733844406343/1236235351140339742
   - 再帰 vs スタックを使うループ
   - C++だと参照型を使ってもっと見やすく書ける
     - https://discord.com/channels/1084280443945353267/1227073733844406343/1236324993839792149
     - 再帰関数でいえば、引数に参照を渡して返り値の代わりにした感じ
     - フラグも使わずに済む。どの再帰呼び出しの返り値がnon nullか、を使う感じ
+    - コードは`side_notes.md`に書いておく
+- https://discord.com/channels/1084280443945353267/1227073733844406343/1236235351140339742
+  - step 1のスタックとループのコード。再帰でも書けて、そのほうがわかりやすく感じる
+- 再帰はいくつか欠点があるとコメント集で見た気がして、若干避けている
+  - スタックサイズの制限はある
+  - 他はあまり覚えてない、というか理解していない
+  - https://docs.google.com/document/d/11HV35ADPo9QxJOpJQ24FcZvtvioli770WWdZZDaLOfg/edit?tab=t.0#heading=h.deivkzaqvetb
+    - https://discord.com/channels/1084280443945353267/1350090869390311494/1355224179720458261
+    - スタックトレースが役立たなくなる、という感じ？
+
+## 清書
+- step 1と同じ方針で清書する
+
+```java
+// step 2 清書
+class Solution {
+  record NodeAndDepth(TreeNode node, int depth) {
+  }
+
+  public int maxDepth(TreeNode root) {
+    Deque<NodeAndDepth> stack = new ArrayDeque<>();
+    stack.push(new NodeAndDepth(root, 1));
+    int result = 0;
+    while (!stack.isEmpty()) {
+      NodeAndDepth top = stack.pop();
+      TreeNode node = top.node();
+      int depth = top.depth();
+      if (node == null) {
+        continue;
+      }
+      result = Math.max(result, depth);
+      stack.push(new NodeAndDepth(node.left, depth + 1));
+      stack.push(new NodeAndDepth(node.right, depth + 1));
+    }
+    return result;
+  }
+}
+```
+
+- スタックとしてArrayListとArrayDequeのどちらを使うのが良いか？ よくわかってない
+  - 変数名`stack`は指摘を受けそうだが、今回はわかりづらくならない気がする（反論はあればありがたいです）
 
