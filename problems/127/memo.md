@@ -143,5 +143,94 @@ class Solution {
 
 
 # step 3
-1回目：14:49
+1回目：14:49、2回目：10:14、3回目：11:05、4回目：10:05
+
+- 10分は切っていないが、このぐらいで良いかと思った
+
+```java
+public class Solution {
+  // Returns 0 if there is no ladder
+  public int ladderLength(String beginWord, String endWord, List<String> wordList) {
+    Map<String, List<String>> patternToNeighbors = buildGraph(beginWord, wordList);
+
+    List<String> words = new ArrayList<>();
+    words.add(beginWord);
+    Set<String> visited = new HashSet<>();
+    visited.add(beginWord);
+    int length = 1;
+    while (!words.isEmpty()) {
+      List<String> nextWords = new ArrayList<>();
+      for (String word : words) {
+        if (word.equals(endWord)) {
+          return length;
+        }
+        addNeighbors(patternToNeighbors, word, nextWords, visited);
+      }
+      words = nextWords;
+      ++length;
+    }
+
+    return 0;
+  }
+
+  String buildPattern(String word, int i) {
+    char[] wordArray = word.toCharArray();
+    wordArray[i] = '*';
+    return String.valueOf(wordArray);
+  }
+
+  Map<String, List<String>> buildGraph(String beginWord, List<String> wordList) {
+    Map<String, List<String>> patternToNeighbors = new HashMap<>();
+    List<String> words = new ArrayList<>(wordList);
+    words.add(beginWord);
+    for (String word : words) {
+      for (int i = 0; i < word.length(); ++i) {
+        String pattern = buildPattern(word, i);
+        patternToNeighbors.computeIfAbsent(pattern, _k -> new ArrayList<>())
+            .add(word);
+      }
+    }
+    return patternToNeighbors;
+  }
+
+  void addNeighbors(Map<String, List<String>> patternToNeighbors,
+      String word, List<String> nextWords, Set<String> visited) {
+    for (int i = 0; i < word.length(); ++i) {
+      String pattern = buildPattern(word, i);
+      for (String nextWord : patternToNeighbors.get(pattern)) {
+        if (visited.contains(nextWord)) {
+          continue;
+        }
+        visited.add(nextWord);
+        nextWords.add(nextWord);
+      }
+    }
+  }
+}
+```
+
+- step 2から変わったところ：
+  - `buildGraph`で`beginWord`を特別扱いしないことにした
+    - 単に`wordList`（のコピー）に`add`した
+  - `new String(char[])`の代わりに`String.valueOf(char[])`にしてみた
+  - 変数名`adjacency`を`patternToNeighbors`に
+  - 他は大体そのまま
+    - （使わない変数`p`を`_k`にrename、`buildPattern(word, i)`を変数におく）
+
+## step 3 補足
+- `for (int i = 0; i < word.length(); ++i)`がくり返しているのでまとめてもいい、と思った
+- そんなに自然かというとよくわからない
+
+```java
+// `for (int i = 0; i < word.length(); ++i)`をまとめたコード
+  List<String> buildPatterns(String word) {
+    List<String> patterns = new ArrayList<>();
+    for (int i = 0; i < word.length(); ++i) {
+      char[] wordArray = word.toCharArray();
+      wordArray[i] = '*';
+      patterns.add(String.valueOf(wordArray));
+    }
+    return patterns;
+  }
+```
 
