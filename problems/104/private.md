@@ -1,12 +1,18 @@
 問題（104. Maximum Depth of Binary Tree）：https://leetcode.com/problems/maximum-depth-of-binary-tree/
 
+# ファイル構成
+`memo.md`のコードをレビューしてくだされば幸いです。
+ファイルが長くなりすぎないよう、一部を別ファイル`side_notes.md`に分離しました。
+
+
 # step 1
 - かかった時間：12:34
 - 発想：
   - DFSすればいい
   - スタックを使いループで書く
 - 迷ったところ：
-  - 深く考えず`List<TreeNode> nodes`と書き、whileの中身を書きはじめて迷った
+  - まず、深く考えず`List<TreeNode> nodes`と書いた（`NodeAndNum`ではなく）
+  - whileの中身を書きはじめたところで、迷った
 
 ```java
 // step 1
@@ -59,6 +65,9 @@ class Solution {
 
 # step 2
 コメント集を見る。
+- https://discord.com/channels/1084280443945353267/1227073733844406343/1236235351140339742
+  - step 1のスタックとループのコードについて
+  - 再帰でも書けて、そのほうがわかりやすく感じる
 - https://discord.com/channels/1084280443945353267/1233603535862628432/1278690571132604460
   - https://github.com/goto-untrapped/Arai60/pull/45/changes
   - JavaのQueue vs Deque vs ArrayDeque (vs LinkedList)
@@ -77,8 +86,6 @@ class Solution {
     - 再帰関数でいえば、引数に参照を渡して返り値の代わりにした感じ
     - フラグも使わずに済む。どの再帰呼び出しの返り値がnon nullか、を使う感じ
     - コードは`side_notes.md`に書いておく
-- https://discord.com/channels/1084280443945353267/1227073733844406343/1236235351140339742
-  - step 1のスタックとループのコード。再帰でも書けて、そのほうがわかりやすく感じる
 - 再帰はいくつか欠点があるとコメント集で見た気がして、若干避けている
   - スタックサイズの制限はある
   - 他はあまり覚えてない、というか理解していない
@@ -116,5 +123,9 @@ class Solution {
 ```
 
 - スタックとしてArrayListとArrayDequeのどちらを使うのが良いか？ よくわかってない
-  - 変数名`stack`は指摘を受けそうだが、今回はわかりづらくならない気がする（反論はあればありがたいです）
+  - 変数名`stack`は指摘を受けそうだが、今回はわかりづらくならない気がする（異論はあればありがたいです）
+
+
+# step 3
+
 
