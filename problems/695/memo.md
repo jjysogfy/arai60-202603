@@ -387,3 +387,101 @@ class UnionFind<T> {
   }
 }
 ```
+
+
+# step 4
+レビューを反映したコードを、何も見ずに書いてみる。
+- 15分程度（ミスあり）
+  - ミス：`new UnionFind<>()`の`<>`忘れと、WATERしかない場合にバグ
+  - （どちらもstep 3でやったことのあるミス）
+- ループをひとつにまとめた
+  - 列のunion、行のunion、areaの計算を「1-pass」で行う
+- ところで、step 3 / 4では、ファクトリ・メソッド`Cell.of`を書いた
+  - 将来キャッシュするかもとか思って作った
+  - しかし、普通に`new`で書いたほうが、この会の趣旨には合うかもしれない？
+  - 短く書けるなら、そのほうが効率が良い
+
+```java
+// step 4 レビューを反映したコード
+class Solution {
+  static final int LAND = 1;
+
+  record Cell(int row, int col) {
+    static Cell of(int row, int col) {
+      return new Cell(row, col);
+    }
+  }
+
+  public int maxAreaOfIsland(int[][] grid) {
+    int height = grid.length;
+    int width = grid[0].length;
+    int maxArea = 0;
+    UnionFind<Cell> islands = new UnionFind<>(height * width,
+        cell -> width * cell.row() + cell.col());
+    for (int row = 0; row < height; ++row) {
+      for (int col = 0; col < width; ++col) {
+        if (grid[row][col] != LAND) {
+          continue;
+        }
+        if (row + 1 < height && grid[row + 1][col] == LAND) {
+          islands.union(Cell.of(row, col), Cell.of(row + 1, col));
+        }
+        if (col + 1 < width && grid[row][col + 1] == LAND) {
+          islands.union(Cell.of(row, col), Cell.of(row, col + 1));
+        }
+        int area = islands.getComponentSize(Cell.of(row, col));
+        maxArea = Math.max(maxArea, area);
+      }
+    }
+    return maxArea;
+  }
+}
+
+class UnionFind<T> {
+  int[] parents;
+  int[] sizes;
+  ToIntFunction<T> indexByItem;
+
+  UnionFind(int size, ToIntFunction<T> indexByItem) {
+    this.parents = IntStream.range(0, size).toArray();
+    this.sizes = new int[size];
+    Arrays.fill(this.sizes, 1);
+    this.indexByItem = indexByItem;
+  }
+
+  int find(T item) {
+    return findByIndex(indexByItem.applyAsInt(item));
+  }
+
+  int findByIndex(int index) {
+    if (parents[index] == index) {
+      return index;
+    }
+    return parents[index] = findByIndex(parents[index]);
+  }
+
+  void union(T item1, T item2) {
+    int root1 = find(item1);
+    int root2 = find(item2);
+    if (root1 == root2) {
+      return;
+    }
+    int smaller = root1;
+    int larger = root2;
+    if (sizes[smaller] > sizes[larger]) {
+      int tmp = smaller;
+      smaller = larger;
+      larger = tmp;
+    }
+    parents[smaller] = larger;
+    sizes[larger] += sizes[smaller];
+  }
+
+  int getComponentSize(T item) {
+    int root = find(item);
+    return this.sizes[root];
+  }
+}
+// step 4 終わり
+```
+
