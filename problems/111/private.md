@@ -108,3 +108,33 @@ class Solution {
 ## 清書
 BFSで書いておく。
 
+```java
+class Solution {
+  public int minDepth(TreeNode root) {
+    if (root == null) {
+      return 0;
+    }
+
+    Queue<TreeNode> frontier = new ArrayDeque<>();
+    frontier.add(root);
+    int depth = 1;
+    while (true) {
+      Queue<TreeNode> nextFrontier = new ArrayDeque<>();
+      for (TreeNode node : frontier) {
+        if (node.left == null && node.right == null) {
+          return depth;
+        }
+        if (node.left != null) {
+          nextFrontier.add(node.left);
+        }
+        if (node.right != null) {
+          nextFrontier.add(node.right);
+        }
+      }
+      frontier = nextFrontier;
+      ++depth;
+    }
+  }
+}
+```
+
