@@ -50,7 +50,7 @@ class Solution {
 - nullの扱い
   - 内部のメソッドでは、`return Integer.MAX_VALUE;`とした
     - 微妙にややこしいが、番兵としてうまくいく
-    - minDepthは`leaves.map(l -> depth to l).min()`という感じで、空集合の下限が無限大というのは自然
+    - minDepthは`leaves.map(l -> lまでの深さ).min()`という感じで、空集合の下限が無限大というのは自然
   - 他にも方法はありそう
     - あまり`Integer.MAX_VALUE`を持ち出したくない人もいそう？？
     - `computeMinDepth(null)`は呼び出さず、親の方ですべて処理するとか
@@ -138,3 +138,9 @@ class Solution {
 }
 ```
 
+
+# step 3
+1回目：5:18、2回目（ミスあり）：4:07
+
+ミス：
+- ArrayDequeとすべきところArrayListに
