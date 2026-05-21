@@ -140,7 +140,9 @@ class Solution {
 
 
 # step 3
-1回目：5:18、2回目（ミスあり）：4:07
+1回目：5:18、2回目（ミスあり）：4:07、3回目（ミスあり）：4:09
 
 ミス：
 - ArrayDequeとすべきところArrayListに
+- typo
+  - nodeをnodesと
