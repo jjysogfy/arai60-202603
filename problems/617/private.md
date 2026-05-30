@@ -51,7 +51,7 @@ Javaでたくさん解いている人のコード
   - root1を破壊し、`return root1;`する
   - そういう設計なら返り値`void`でも自然かも。root1がnullのとき困るけど
 - スタックを使うループで書く方法もある
-  - [前回](https://github.com/jjysogfy/arai60-202603/pull/11)でいう「上から配る + ループ」
+  - [前回](https://github.com/jjysogfy/arai60-202603/pull/11)でいう「上から配る + ループ」っぽい
   - 配るというか、求める木を上から作る、という感じ
   - （TreeNodeが）可変なのを使っている
 - 番兵`new TreeNode(0)`が便利
@@ -64,18 +64,7 @@ Javaでたくさん解いている人のコード
     - JVMはスタックマシンというものだと、前にAIに教えられた。よくわかってないけど
       - そういう事情もあり気になった
     - JVMのメモリの構造について、AIにきいてみよう
-    - きいた。自分なりのまとめ：
-      - スタックマシンとは、算術演算が基本的にスタックトップだけを対象とするマシンのこと
-      - JVMはスタックマシンで、そのスタックはオペランド・スタックとよばれる
-      - メソッドが呼び出されるとフレームが作成されるが、その中にオペランド・スタックも置かれる
-        - 各メソッドのオペランド・スタックの最大長はコンパイル時に決定済
-      - メソッド呼び出しのフレームは、JVMスタックというものに積まれる
-        - ローカル変数はスタックフレームの中にしまわれる
-        - JVMスタックとは別に、ヒープ領域もちゃんとある
-      - 実際の実行時には、バイトコードをインタプリタで実行するか、JITで機械語にコンパイルし実行する
-        - JITでは、オペランド・スタックはレジスタに割り当てられることが多い
-    - ひとくちにスタックと言っても、ここでは、オペランド・スタック、JVMスタック、物理的なマシンのスタック、の3つがある
-      - 振り返ると、そのせいでちょっと疑問に思ったということかも
+      - わかったことは`side_notes.md`にまとめた
     - こういう話題、（Language Specification以外に）どういう資料を見ると良いのかよくわからない
 
 step 1に近い方針で書く
@@ -104,57 +93,23 @@ class Solution {
 // step 2 その1終わり
 ```
 
-「上から配る + 再帰」を書いてみる
-- これはJavaだとちょっと書きづらいのだった
-  - TreeNodeではなくintを返すときも、AtomicIntegerを利用（乱用？）した
-- TreeNodeの場合、`TreeNode.left`への参照を取れないのでさらに書きづらい
-- ラムダを使う以下の方法を思いついた
-  - けっこう変な書き方のような気もする？
-```java
-// step 2 その2 「上から配る + 再帰」の変な（？）書き方
-class Solution {
-  class TreeNodeRef implements Consumer<TreeNode> {
-    TreeNode node;
+「上から作る + 再帰」を書いてみる
+- 書いてはみた
+  - コードは`side_notes.md`にある
 
-    @Override
-    public void accept(TreeNode node) {
-      this.node = node;
-    }
-  }
+step 3終わってからの追記：
+- しかし、ずっと簡単に書けることに、あとから気づいた
+- 順番を入れ替えるだけでよかった
+  - step 1は`var leftNode = mergeTrees(...); return new TreeNode(...)`の順で、「下から作る」方法
+  - 逆順の`var merged = new TreeNode(...); merged.left = mergeTrees(...)`が「上から作る」方法
+  - 最後に作られるノードが、rootか、右下のleafか、の違い
+- ………と、思ったが、「上から作る」にも2種類ある、ということか
+  - 辺が作られる順番が違う
+  - 最後に作られる辺が、root -- root.rightか、（右下のleafの親） -- 右下のleafか、の違いみたいな感じ
+- ちょっと整理しきれていないかも
+- （step 3終わってからの追記終わり）
 
-  public TreeNode mergeTrees(TreeNode root1, TreeNode root2) {
-    var mergedRef = new TreeNodeRef();
-    mergeTreesHelper(root1, root2, mergedRef);
-    return mergedRef.node;
-  }
-
-  private void mergeTreesHelper(TreeNode root1, TreeNode root2, Consumer<TreeNode> resultWriter) {
-    if (root1 == null && root2 == null) {
-      resultWriter.accept(null);
-      return;
-    }
-
-    TreeNode node1 = root1 != null ? root1 : new TreeNode(0);
-    TreeNode node2 = root2 != null ? root2 : new TreeNode(0);
-    TreeNode merged = new TreeNode(node1.val + node2.val);
-    resultWriter.accept(merged);
-    mergeTreesHelper(node1.left, node2.left, node -> { merged.left = node; });
-    mergeTreesHelper(node1.right, node2.right, node -> { merged.right = node; });
-  }
-}
-// step 2 その2終わり
-```
-
-- 思いついた過程：
-  - しばらく（30分以上？）かかった
-  - はじめ`class TreeNodeRef { TreeNode node; }`としたが、`TreeNode.left`への参照が取れなくて困る
-  - TreeNodeRefにgetterとsetterを追加し、これを匿名クラスでオーバーライドすればいいと考える
-  - 再帰呼び出しの引数に、匿名クラスとして作ったTreeNodeRefの子クラスを渡して、Accepted
-    - `mergeTreesHelper(node1.left, node2.left, new TreeNodeRef() { @Override void setNode(TreeNode node) { ... } })`
-  - しかし匿名クラスを書くのが煩雑なので、整理したくなる
-  - getterは要らないと気づいて削除。メソッド1つなので（匿名クラスでなく）ラムダで書ける。しばらく整理して上の形になった
-
-- もう少し他の書き方（root1を破壊、「上から配る + ループ」など）を試しても良いかもしれないけど、進みが遅いのでさっさと進むことに
+もう少し他の書き方（root1を破壊、「上から配る + ループ」など）を試しても良いかもしれないけど、進みが遅いのでさっさと進むことに
 
 
 ## step 2.1 清書
