@@ -22,6 +22,11 @@
 
 
 ## 上から作る方法
+この節では、悩んだ過程がかなりそのまま残っています。
+先にmemo.mdの「「上から作る + 再帰」を書いてみる」を見ていただくと良いと思います。
+
+---
+
 「上から配る + 再帰」を書いてみる
 - これはJavaだとちょっと書きづらいのだった
   - TreeNodeではなくintを返すときも、AtomicIntegerを利用（乱用？）した
@@ -71,4 +76,18 @@ class Solution {
     - `mergeTreesHelper(node1.left, node2.left, new TreeNodeRef() { @Override void setNode(TreeNode node) { ... } })`
   - しかし匿名クラスを書くのが煩雑なので、整理したくなる
   - getterは要らないと気づいて削除。メソッド1つなので（匿名クラスでなく）ラムダで書ける。しばらく整理して上の形になった
+
+
+step 3終わってからの追記：
+- しかし、「上から作る」のはずっと簡単に書けることに、あとから気づいた
+- 順番を入れ替えるだけでよかった
+  - step 1は`var leftNode = mergeTrees(...); return new TreeNode(...)`の順で、「下から作る」方法
+  - 逆順の`var merged = new TreeNode(...); merged.left = mergeTrees(...)`が「上から作る」方法
+    - step 2.1の清書はこっち
+  - 最後に作られるノードが、rootか、右下のleafか、の違い
+
+- ………と、思ったが、「上から作る」にも2種類ある、ということか
+  - 辺が作られる順番が違う
+  - 最後に作られる辺が、root -- root.rightか、（右下のleafの親） -- 右下のleafか、の違いみたいな感じ
+- ちょっと整理しきれていないかも
 
