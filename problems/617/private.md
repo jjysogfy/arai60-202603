@@ -2,7 +2,6 @@
 
 
 # step 1 解く
-
 ```java
 // step 1のコード
 import java.util.Optional;
@@ -45,17 +44,18 @@ Javaでたくさん解いている人のコード
 
 見て気づいたこと：
 - 片方の木がnullになったら、もう片方の木をreturnしてしまってもよい
+  - 問題文の「Otherwise, the NOT null node will be used as the node of the new tree.」に合うという話もある
+    - このことは上の2つのPRには書いてなさそうだが、誰か他のPRで見かけたと思う
   - 使いまわしたくなければ、deepcopyを作ってもよい
 - 引数を戻り値に使い回すだけでなく、破壊する方法もある
   - root1を破壊し、`return root1;`する
   - そういう設計なら返り値`void`でも自然かも。root1がnullのとき困るけど
 - スタックを使うループで書く方法もある
   - [前回](https://github.com/jjysogfy/arai60-202603/pull/11)でいう「上から配る + ループ」
-  - 配るというか、結果の木を上から作る、という感じ
+  - 配るというか、求める木を上から作る、という感じ
   - （TreeNodeが）可変なのを使っている
 - 番兵`new TreeNode(0)`が便利
   - https://github.com/ryoooooory/LeetCode/pull/26/changes#diff-b215107754aa389ea091c7bce4323e2a33519e27d0e57bcd06b4f901f4f1c573R5
-  - うまい。言われてみればそうか、という感じ
 - 再帰なのでスタックがあふれないか気にするべき
   - また忘れていた気がする
   - https://discord.com/channels/1084280443945353267/1235829049511903273/1236256946403807323
@@ -76,6 +76,7 @@ Javaでたくさん解いている人のコード
         - JITでは、オペランド・スタックはレジスタに割り当てられることが多い
     - ひとくちにスタックと言っても、ここでは、オペランド・スタック、JVMスタック、物理的なマシンのスタック、の3つがある
       - 振り返ると、そのせいでちょっと疑問に思ったということかも
+    - こういう話題、（Language Specification以外に）どういう資料を見ると良いのかよくわからない
 
 step 1に近い方針で書く
 - Optionalではなく三項演算子で書いてみる
@@ -104,7 +105,7 @@ class Solution {
 ```
 
 「上から配る + 再帰」を書いてみる
-- これはJavaだとちょっと書きづいのだった
+- これはJavaだとちょっと書きづらいのだった
   - TreeNodeではなくintを返すときも、AtomicIntegerを利用（乱用？）した
 - TreeNodeの場合、`TreeNode.left`への参照を取れないのでさらに書きづらい
 - ラムダを使う以下の方法を思いついた
@@ -147,10 +148,11 @@ class Solution {
 - 思いついた過程：
   - しばらく（30分以上？）かかった
   - はじめ`class TreeNodeRef { TreeNode node; }`としたが、`TreeNode.left`への参照が取れなくて困る
-  - TreeNodeRefにgetterとsetterを追加し、これをオーバーライドすればいいと考える
+  - TreeNodeRefにgetterとsetterを追加し、これを匿名クラスでオーバーライドすればいいと考える
   - 再帰呼び出しの引数に、匿名クラスとして作ったTreeNodeRefの子クラスを渡して、Accepted
+    - `mergeTreesHelper(node1.left, node2.left, new TreeNodeRef() { @Override void setNode(TreeNode node) { ... } })`
   - しかし匿名クラスを書くのが煩雑なので、整理したくなる
-  - getterは要らないと気づいて削除。メソッド1つなのでラムダで書ける。しばらく整理して上の形になった
+  - getterは要らないと気づいて削除。メソッド1つなので（匿名クラスでなく）ラムダで書ける。しばらく整理して上の形になった
 
 - もう少し他の書き方（root1を破壊、「上から配る + ループ」など）を試しても良いかもしれないけど、進みが遅いのでさっさと進むことに
 
@@ -178,8 +180,18 @@ class Solution {
 // step 2.1清書終わり
 ```
 
-- 番兵でかなりすっきりした
+- 人のPRで見かけた番兵を使った
+  - かなりすっきりした。うまい
+  - 言われてみれば、「step 2 その1」の形式的な書き換えになってる
+  - 直接にもイメージしやすい
 
 
 # step 3 覚える
+1回目：6:55、2回目：3:23、3回目：3:10
+
+- 最終的なコードは清書と同じ
+  - 少し書き換えてもみたけど、元のままのほうが良いと思った
+  - そういう書き換えの例：
+    - `return new TreeNode(...)`
+    - `node1 = Optional.ofNullable(root1).orElseGet(...)`
 
