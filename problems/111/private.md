@@ -50,7 +50,7 @@ class Solution {
 - nullの扱い
   - 内部のメソッドでは、`return Integer.MAX_VALUE;`とした
     - 微妙にややこしいが、番兵としてうまくいく
-    - minDepthは`leaves.map(l -> lまでの深さ).min()`という感じで、空集合の下限が無限大というのは自然
+    - minDepthは`leaves.map(l -> lまでの深さ).min()`という感じで、空集合のmin（正確にはinf）が無限大というのは自然
   - 他にも方法はありそう
     - あまり`Integer.MAX_VALUE`を持ち出したくない人もいそう？？
     - `computeMinDepth(null)`は呼び出さず、親の方ですべて処理するとか
@@ -60,10 +60,10 @@ class Solution {
 コメント集をざっくり見ておく
 - 「上から数字を配っていくか、下から集めてくるかの2方向があって、それぞれ再帰で書くか、スタックとループで書くか、がありますね。」
   - https://discord.com/channels/1084280443945353267/1196472827457589338/1237988315781664770
-  - step 1は、下から集める再帰。
-    - （こういう再帰をループに直すのは大変。[前回やった](https://github.com/jjysogfy/arai60-202603/pull/10/changes#diff-de4e45038fc947e248157e8a2cedd6e179dcfcfaa6d64e31552eb3ee9bb94da3R10)）
-  - 上から配るループも[前回書いた](https://github.com/jjysogfy/arai60-202603/pull/10/changes#diff-3b11adb131cf52e5af58d7d49fa7a4bd8b2e6253247288c0b981f545094247a4R98)
-    - 再帰にするのはJavaだと少し面倒かも。Pythonだとnonlocalを使っているのを見かける
+  - step 1は、「下から集める + 再帰」。
+    - （こういう再帰をループに直すの（「下から集める + ループ」）は大変。[前回やった](https://github.com/jjysogfy/arai60-202603/pull/10/changes#diff-de4e45038fc947e248157e8a2cedd6e179dcfcfaa6d64e31552eb3ee9bb94da3R10)）
+  - 「上から配る + ループ」も[前回書いた](https://github.com/jjysogfy/arai60-202603/pull/10/changes#diff-3b11adb131cf52e5af58d7d49fa7a4bd8b2e6253247288c0b981f545094247a4R98)
+    - 「上から配る + 再帰」はJavaだと少し面倒かも。Pythonだとnonlocalを使っているのを見かける
     - 書いておく。nonlocalの代わりにAtomicIntegerを使っておく
 
 ```java
@@ -97,7 +97,7 @@ class Solution {
 - https://github.com/goto-untrapped/Arai60/pull/46/changes
 - https://github.com/ryoooooory/LeetCode/pull/25/changes
 
-気づいたこと：
+見て気づいたこと：
 - 上から配るDFSは、枝刈りができる
   - `if (depth >= minDepthRef.get()) { return; }`
 - unreachableなのをコンパイラが検出できないとき、無駄なreturnを書く必要がある
@@ -141,8 +141,20 @@ class Solution {
 
 # step 3
 1回目：5:18、2回目（ミスあり）：4:07、3回目（ミスあり）：4:09
+4回目：5:42、5回目（ミスあり）：5:07
 
 ミス：
 - ArrayDequeとすべきところArrayListに
 - typo
   - nodeをnodesと
+  - セミコロン忘れ
+
+時間がかかっている（前回のPRは約1か月前）のもあり、このあたりでやめてしまうことにする
+- コードは清書とほぼ同じ
+- コードは安定してきているが、軽微なミスが残る
+- `Queue... = new ArrayDeque<>()`か`List... = new ArrayList<>()`か迷う
+  - 今回はaddしかしてないので、ArrayListでも良いということ
+  - 調べたら https://stackoverflow.com/questions/29583171/arraydeque-vs-arraylist-to-implement-a-stack
+    - 主な違いはresize戦略（2倍 vs 約1.5倍）
+    - ArrayDequeの方がresize回数が少ない
+  - わりとどちらでも良さそう。ArrayDequeの方が見た目「BFSらしい」感じはする
