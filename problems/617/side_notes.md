@@ -21,8 +21,9 @@
   - 振り返ると、そのせいでちょっと疑問に思ったということかも
 
 
-## 上から作る方法
-この節では、悩んだ過程がかなりそのまま残っています。
+## 上から作る方法を考えた過程
+この節では、悩んだ過程が残してあって、間違いもあると思います。
+
 先にmemo.mdの「「上から作る + 再帰」を書いてみる」を見ていただくと良いと思います。
 
 ---
@@ -33,40 +34,8 @@
 - TreeNodeの場合、`TreeNode.left`への参照を取れないのでさらに書きづらい
 - ラムダを使う以下の方法を思いついた
   - けっこう変な書き方のような気もする？
-```java
-// step 2 その2 「上から配る + 再帰」の変な（？）書き方
-class Solution {
-  class TreeNodeRef implements Consumer<TreeNode> {
-    TreeNode node;
 
-    @Override
-    public void accept(TreeNode node) {
-      this.node = node;
-    }
-  }
-
-  public TreeNode mergeTrees(TreeNode root1, TreeNode root2) {
-    var mergedRef = new TreeNodeRef();
-    mergeTreesHelper(root1, root2, mergedRef);
-    return mergedRef.node;
-  }
-
-  private void mergeTreesHelper(TreeNode root1, TreeNode root2, Consumer<TreeNode> resultWriter) {
-    if (root1 == null && root2 == null) {
-      resultWriter.accept(null);
-      return;
-    }
-
-    TreeNode node1 = root1 != null ? root1 : new TreeNode(0);
-    TreeNode node2 = root2 != null ? root2 : new TreeNode(0);
-    TreeNode merged = new TreeNode(node1.val + node2.val);
-    resultWriter.accept(merged);
-    mergeTreesHelper(node1.left, node2.left, node -> { merged.left = node; });
-    mergeTreesHelper(node1.right, node2.right, node -> { merged.right = node; });
-  }
-}
-// step 2 その2終わり
-```
+（コードはmemo.mdに移した）
 
 - 思いついた過程：
   - しばらく（30分以上？）かかった
@@ -80,7 +49,7 @@ class Solution {
 
 step 3終わってからの追記：
 - しかし、「上から作る」のはずっと簡単に書けることに、あとから気づいた
-- 順番を入れ替えるだけでよかった
+- 行の順番を入れ替えるだけでよかった
   - step 1は`var leftNode = mergeTrees(...); return new TreeNode(...)`の順で、「下から作る」方法
   - 逆順の`var merged = new TreeNode(...); merged.left = mergeTrees(...)`が「上から作る」方法
     - step 2.1の清書はこっち
@@ -90,4 +59,6 @@ step 3終わってからの追記：
   - 辺が作られる順番が違う
   - 最後に作られる辺が、root -- root.rightか、（右下のleafの親） -- 右下のleafか、の違いみたいな感じ
 - ちょっと整理しきれていないかも
+
+---
 

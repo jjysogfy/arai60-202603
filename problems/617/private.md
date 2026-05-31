@@ -95,14 +95,62 @@ class Solution {
 
 
 ## 「上から作る + 再帰」を書いてみる
+[前回](https://github.com/jjysogfy/arai60-202603/pull/11)は、書き方として「上から配る」「下から集める」の2つがあった。
+この問題でも似たような区別がありそう。
 - step 1は「下から作る + 再帰」だった
+  - （はじめに`new`されるノードはleaf）
 - 「上から作る + 再帰」には2種類ありそう
-  - ノードは上から作る
-  - 辺も上から作るか、辺は下から作るか
-- 詳細は`side_notes.md`にある
-  - ノードも辺も上から作るほうを先に考えた（こちらのが大変）
-  - ノードは上から、辺は下から作る方はあとから気づいた
-    - step 2.1の清書はこれ（だとあとから気づいた）
+  - ノードは上から作る（はじめに`new`されるノードはroot）
+  - 辺も上から作るか、辺は下から作るか（はじめに代入される`TreeNode.left`は、root.leftか、leafか、みたいな感じ）
+- 「ノードも辺も上から作る + 再帰」は以下に書いた
+- 「ノードは上から、辺は下から作る + 再帰」は、「下から作る + 再帰」とかなり似ている
+  - step 2.1の清書
+
+```java
+// step 2 その2 「ノードも辺も上から作る + 再帰」の変な（？）書き方
+class Solution {
+  class TreeNodeRef implements Consumer<TreeNode> {
+    TreeNode node;
+
+    @Override
+    public void accept(TreeNode node) {
+      this.node = node;
+    }
+  }
+
+  public TreeNode mergeTrees(TreeNode root1, TreeNode root2) {
+    var mergedRef = new TreeNodeRef();
+    mergeTreesHelper(root1, root2, mergedRef);
+    return mergedRef.node;
+  }
+
+  private void mergeTreesHelper(TreeNode root1, TreeNode root2, Consumer<TreeNode> resultWriter) {
+    if (root1 == null && root2 == null) {
+      resultWriter.accept(null);
+      return;
+    }
+
+    TreeNode node1 = root1 != null ? root1 : new TreeNode(0);
+    TreeNode node2 = root2 != null ? root2 : new TreeNode(0);
+    TreeNode merged = new TreeNode(node1.val + node2.val);
+    resultWriter.accept(merged);
+    mergeTreesHelper(node1.left, node2.left, node -> { merged.left = node; });
+    mergeTreesHelper(node1.right, node2.right, node -> { merged.right = node; });
+  }
+}
+// step 2 その2終わり
+```
+
+- `TreeNode.left`への参照を取れないのでちょっと書きづらかった
+- そこで工夫してこのコードを書いた
+- 自分にとってはあまり見たことがない書き方になったので、この方針は避けたほうがいいのかなという気もする
+
+考えた過程について
+- 「ノードも辺も上から作る + 再帰」を先に考えた（こちらのが大変）
+- 「ノードは上から、辺は下から作る + 再帰」はあとから気づいた
+  - step 2.1の清書はこの方法だと、step 3終わってから気づいた
+- 考えた過程の詳細は`side_notes.md`に残してある（あまり整理していませんが）
+
 
 もう少し他の書き方（root1を破壊、「上から配る + ループ」など）を試しても良いかもしれないけど、進みが遅いのでさっさと進むことに
 
