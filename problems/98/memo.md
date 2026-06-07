@@ -159,6 +159,37 @@ class Solution {
 
 # step 3 3回書く
 1回目：7:21、2回目：3:11、3回目（ミスあり）：3:37
+4回目：2:54、5回目：2:34、6回目：2:37
 
 - ミス
   - return true忘れ
+
+- コードは変数の宣言の順番が変わった以外は、step 2.2 清書と同じ
+  - 振り返ると、変数名lowよりpreviousのが少しわかりやすかったかも？
+
+```java
+// step 3のコード（step 2.2 清書とほとんど同じ）
+class Solution {
+  public boolean isValidBST(TreeNode root) {
+    Deque<TreeNode> nodes = new ArrayDeque<>();
+    pushLeftChildren(root, nodes);
+    long low = Long.MIN_VALUE;
+    while (!nodes.isEmpty()) {
+      TreeNode node = nodes.pop();
+      if (!(low < node.val)) {
+        return false;
+      }
+      low = node.val;
+      pushLeftChildren(node.right, nodes);
+    }
+    return true;
+  }
+
+  private void pushLeftChildren(TreeNode node, Deque<TreeNode> nodes) {
+    while (node != null) {
+      nodes.push(node);
+      node = node.left;
+    }
+  }
+}
+```
