@@ -100,7 +100,7 @@ class Solution {
 ```
 
 書いて思ったこと：
-- Javaでは参照が取れないので、コールバックを使ってみた
+- Javaでは`node.left`などの参照を取れないので、コールバックを使ってみた
   - あまり見かけない
   - 前に書いたことはある https://github.com/jjysogfy/arai60-202603/pull/12/changes#diff-5793c905e594ca7f475c5d14533717def859f8cf7b22a7ffd23cef21b9029107R111
 - スタックに何を積むか、ちょっと迷ってしまった
@@ -144,7 +144,8 @@ class Solution {
 書いて思ったこと：
 - 浮動小数点数まわりは不安
   - sqrtの正しさは保証されている https://docs.oracle.com/en/java/javase/26/docs/api/java.base/java/lang/Math.html#sqrt(double)
-  - 制約は`nums.length <= 10^4`なので大丈夫そう？（根拠は持ってない）
+  - 制約は`nums.length <= 10^4`だった
+  - それなら大丈夫そう？（根拠は持ってない）
 
 
 ## step 2.3：清書
@@ -169,9 +170,29 @@ class Solution {
 
 # step 3
 1回目（ミスあり）：4:10、2回目：2:20、3回目（ミスあり）：2:30
+4回目：2:32、5回目：2:41、6回目：2:45
 
 ミス：
-- beginとendの代わりに、subListを使おうとして、ライブラリの使い方をいろいろ間違えた
-  - （配列をListに変換忘れ、添字アクセスを`.get`にし忘れた、など）
+- sortedArrayToBstHelperで、beginとendの代わりに、subListを使おうとして（続く）
+- 、ライブラリの使い方をいろいろ間違えた
+  - 配列をListに変換忘れ、添字アクセスを`.get`にし忘れた、など
 - `sortedArrayToBstHelper(nums, 0, middle)`としてしまった（0 -> begin）
 
+```java
+// step 3
+class Solution {
+  public TreeNode sortedArrayToBST(int[] nums) {
+    return sortedArrayToBstHelper(nums, 0, nums.length);
+  }
+
+  private TreeNode sortedArrayToBstHelper(int[] nums, int begin, int end) {
+    if (end - begin <= 0) {
+      return null;
+    }
+    int middle = (begin + end) / 2;
+    TreeNode leftNode = sortedArrayToBstHelper(nums, begin, middle);
+    TreeNode rightNode = sortedArrayToBstHelper(nums, middle + 1, end);
+    return new TreeNode(nums[middle], leftNode, rightNode);
+  }
+}
+```
