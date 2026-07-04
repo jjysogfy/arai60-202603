@@ -194,3 +194,84 @@ class Solution {
     - `return new TreeNode(...)`
     - `node1 = Optional.ofNullable(root1).orElseGet(...)`
 
+
+# step 4 解き直し
+```java
+// step 4 「上から作る + 再帰」のConsumerなどを使わない書き方
+class Solution {
+  public TreeNode mergeTrees(TreeNode root1, TreeNode root2) {
+    if (root1 == null && root2 == null) {
+      return null;
+    }
+    TreeNode merged = new TreeNode(0);
+    mergeTreesHelper(root1, root2, merged);
+    return merged;
+  }
+
+  private void mergeTreesHelper(TreeNode node1, TreeNode node2, TreeNode merged) {
+    node1 = node1 == null ? new TreeNode(0) : node1;
+    node2 = node2 == null ? new TreeNode(0) : node2;
+    merged.val = node1.val + node2.val;
+
+    if (node1.left != null || node2.left != null) {
+      merged.left = new TreeNode(0);
+      mergeTreesHelper(node1.left, node2.left, merged.left);
+    }
+    if (node1.right != null || node2.right != null) {
+      merged.right = new TreeNode(0);
+      mergeTreesHelper(node1.right, node2.right, merged.right);
+    }
+  }
+}
+```
+
+- 8分程度
+
+- 「下から作る + ループ」も書いた
+  - 「step 2.1 清書」とほぼ同じコードになった
+
+
+## step 4.1 書き直しの続き
+```java
+// step 4.1 「上から作る + ループ」
+class Solution {
+  private record StackFrame(TreeNode node1, TreeNode node2, TreeNode merged) {
+  }
+
+  public TreeNode mergeTrees(TreeNode root1, TreeNode root2) {
+    if (root1 == null && root2 == null) {
+      return null;
+    }
+
+    TreeNode mergedRoot = new TreeNode(0);
+    Deque<StackFrame> stack = new ArrayDeque<StackFrame>();
+    stack.push(new StackFrame(root1, root2, mergedRoot));
+
+    while (!stack.isEmpty()) {
+      StackFrame frame = stack.pop();
+      TreeNode node1 = frame.node1 == null ? new TreeNode(0) : frame.node1;
+      TreeNode node2 = frame.node2 == null ? new TreeNode(0) : frame.node2;
+      TreeNode merged = frame.merged;
+
+      merged.val = node1.val + node2.val;
+      if (node1.left != null || node2.left != null) {
+        merged.left = new TreeNode(0);
+        stack.push(new StackFrame(node1.left, node2.left, merged.left));
+      }
+      if (node1.right != null || node2.right != null) {
+        merged.right = new TreeNode(0);
+        stack.push(new StackFrame(node1.right, node2.right, merged.right));
+      }
+    }
+    return mergedRoot;
+  }
+}
+```
+
+- 7:07
+  - 1ミス：stackへのはじめのpushを忘れた
+  - この再帰のループへの書き直しは簡単だった：
+    - 返り値はvoid
+    - 2回の再帰呼び出しの順序があまり重要ではない
+      - このスタックとループのコードだと、stackにpushした時点ではなく、ループの末尾にきた時点で、再帰呼び出しが行われる感じになる
+      - そういう順序の呼び出しでもいいから簡単だった、のだと思う
