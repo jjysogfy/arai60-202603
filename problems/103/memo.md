@@ -66,11 +66,11 @@ Javaでたくさん解いている人のコードを読む
   - https://github.com/ryoooooory/LeetCode/pull/30/changes#diff-e0b1c5268a02e46b16c0f221400cd45efeaca417cccff8593ddaba80c537d1daR1
 
 - reverseするタイミング
-  - （各レベルの）順方向のリストを作った直後にreverseする
+  - 各レベルで、順方向のリストを作った直後にreverseする
     - step 1のやりかた
-  - そもそも逆方向のリストだけを作る
+  - そもそも逆方向のリストだけを（奇数レベルでは）作る
     - https://github.com/goto-untrapped/Arai60/pull/51/changes#diff-d83b4f3c60802130fcbcb68a6a649141d38d591843732126fdf1efbfabbec898R39
-  - 全てのレベルを処理したあと、reverseする
+  - 全てのレベルを処理したあと、奇数レベルをreverseする
     - https://github.com/goto-untrapped/Arai60/pull/51/changes#diff-96f06b82af40361c4868bc6c29f499bfd6bd8a20144b2492d372436fc0b0adf2R25
 
 - `List.addFirst`を使っている人がいる
@@ -122,4 +122,17 @@ class Solution {
   }
 }
 ```
+
+
+# step 3
+1回目（1ミス）：8:11、2回目：5:55、3回目（1ミス）：7:14
+4回目：4:25、5回目（1ミス）：6:41、
+
+- 犯したミス：
+  - キューにnullを入れるバージョンで書いたところ、ArrayDequeにnullをaddしてしまいNullPointerException
+    - ArrayListはnull許容だが、ArrayDequeは不可
+  - Stream APIを使って`values`を作る書き方をしたところ、`Collectors.toList`の使い方を間違えた
+    - `.collect(Collectors.toList())`の`()`を忘れた
+  - スペルミス
+    - DequeをDepthと書いた
 
