@@ -125,8 +125,9 @@ class Solution {
 
 
 # step 3
-1回目（1ミス）：8:11、2回目：5:55、3回目（1ミス）：7:14
-4回目：4:25、5回目（1ミス）：6:41、
+1回目（1ミス）：8:11、2回目：5:55、3回目（1ミス）：7:14、
+4回目：4:25、5回目（1ミス）：6:41、6回目：5:57、
+7回目：3:32、8回目：4:03
 
 - 犯したミス：
   - キューにnullを入れるバージョンで書いたところ、ArrayDequeにnullをaddしてしまいNullPointerException
@@ -136,3 +137,42 @@ class Solution {
   - スペルミス
     - DequeをDepthと書いた
 
+コードは清書とほぼ同じ。空行の入り方が違う程度。
+```java
+// step 3
+class Solution {
+  public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+    if (root == null) {
+      return new ArrayList<>();
+    }
+
+    List<List<Integer>> result = new ArrayList<>();
+    Deque<TreeNode> frontier = new ArrayDeque<>();
+    frontier.add(root);
+    int depth = 0;
+    while (!frontier.isEmpty()) {
+      Deque<TreeNode> nextFrontier = new ArrayDeque<>();
+
+      List<Integer> values = new ArrayList<>();
+      for (TreeNode node : frontier) {
+        values.add(node.val);
+        if (node.left != null) {
+          nextFrontier.add(node.left);
+        }
+        if (node.right != null) {
+          nextFrontier.add(node.right);
+        }
+      }
+      if (depth % 2 != 0) {
+        Collections.reverse(values);
+      }
+      result.add(values);
+
+      frontier = nextFrontier;
+      ++depth;
+    }
+
+    return result;
+  }
+}
+```
