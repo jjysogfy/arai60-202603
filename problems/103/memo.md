@@ -3,10 +3,6 @@ https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/
 
 
 # step 1
-- 16分ぐらい
-  - スマホから
-- 大まかな方針は決めていたが、書き切るのはわりと悩んでしまった
-
 ```java
 // step 1 その1
 class Solution {
@@ -42,6 +38,11 @@ class Solution {
   }
 }
 ```
+
+- 前に答えを読んだ
+- 16分ぐらい
+  - スマホから
+- 大まかな方針は決めていたが、書き切るのはわりと悩んでしまった
 
 ## step 1.2
 「step 1 その1」のコードを書いてから時間が空いてしまったので、改めて見ずに書いてみた。

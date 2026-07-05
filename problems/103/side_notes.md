@@ -46,3 +46,51 @@ class Solution {
 - ArrayDequeで書きはじめ、途中からArrayListに直した
   - メソッド名が一部違うことに注意すべきだった。今回はaddしかしてないからたまたま問題なかったが
 
+
+# step 2 への補足
+上述の「step 1 その2」に近い形の清書も考えてみた。`values`をstreamで作る。
+
+```java
+// step 2 その2
+class Solution {
+  public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+    if (root == null) {
+      return new ArrayList<>();
+    }
+
+    List<List<Integer>> result = new ArrayList<>();
+    List<TreeNode> frontier = new ArrayList<>();
+    frontier.add(root);
+    int depth = 0;
+
+    while (!frontier.isEmpty()) {
+      List<TreeNode> nextFrontier = new ArrayList<>();
+      for (TreeNode node : frontier) {
+        if (node.left != null) {
+          nextFrontier.add(node.left);
+        }
+        if (node.right != null) {
+          nextFrontier.add(node.right);
+        }
+      }
+      List<Integer> values = frontier.stream().map(node -> node.val)
+          .collect(Collectors.toCollection(ArrayList::new));
+      if (depth % 2 != 0) {
+        Collections.reverse(values);
+      }
+      result.add(values);
+
+      frontier = nextFrontier;
+      ++depth;
+    }
+
+    return result;
+  }
+}
+```
+
+- 2ミス
+  - `List<Integer> frontier`としてしまった
+  - valuesを`Stream.toList`でリスト化してしまった
+    - これはimmutable。Collections.reverseで例外が出る
+
