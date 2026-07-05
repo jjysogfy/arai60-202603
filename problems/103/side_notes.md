@@ -92,5 +92,45 @@ class Solution {
 - 2ミス
   - `List<Integer> frontier`としてしまった
   - valuesを`Stream.toList`でリスト化してしまった
-    - これはimmutable。Collections.reverseで例外が出る
+    - これはimmutable。`Collections.reverse`で例外が出る
+
+さらに少し書き直しておく
+```java
+// step 2 その3
+class Solution {
+  public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+    if (root == null) {
+      return new ArrayList<>();
+    }
+
+    List<List<Integer>> result = new ArrayList<>();
+    Deque<TreeNode> nodes = new ArrayDeque<>();
+    nodes.add(root);
+    int depth = 0;
+    while (!nodes.isEmpty()) {
+      Deque<TreeNode> nextNodes = new ArrayDeque<>();
+
+      List<Integer> values = nodes.stream().map(node -> node.val)
+          .collect(Collectors.toCollection(ArrayList::new));
+      if (depth % 2 != 0) {
+        Collections.reverse(values);
+      }
+      result.add(values);
+
+      for (TreeNode node : nodes) {
+        if (node.left != null) {
+          nextNodes.add(node.left);
+        }
+        if (node.right != null) {
+          nextNodes.add(node.right);
+        }
+      }
+      nodes = nextNodes;
+      ++depth;
+    }
+
+    return result;
+  }
+}
+```
 
