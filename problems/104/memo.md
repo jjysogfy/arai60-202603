@@ -131,3 +131,41 @@ class Solution {
 1回目：4:31、2回目：3:12、3回目：3:12
 
 コードはstep 2の清書と全く同じになってしまった。
+
+
+# step 4
+```java
+class Solution {
+  private record NodeAndDepth(TreeNode node, int depth) {
+  }
+
+  public int maxDepth(TreeNode root) {
+    if (root == null) {
+      return 0;
+    }
+
+    List<NodeAndDepth> nodes = new ArrayList<>();
+    nodes.add(new NodeAndDepth(root, 1));
+    int maxDepthOfTree = 1;
+
+    while (!nodes.isEmpty()) {
+      NodeAndDepth top = nodes.removeLast();
+      TreeNode node = top.node;
+      int depth = top.depth;
+
+      maxDepthOfTree = Math.max(maxDepthOfTree, depth);
+
+      if (node.left != null) {
+        nodes.add(new NodeAndDepth(node.left, depth + 1));
+      }
+      if (node.right != null) {
+        nodes.add(new NodeAndDepth(node.right, depth + 1));
+      }
+    }
+
+    return maxDepthOfTree;
+  }
+}
+```
+
+- かかった時間：6:19
