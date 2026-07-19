@@ -234,3 +234,82 @@ public class Solution {
   }
 ```
 
+
+# step 4
+解き直し。
+```java
+class Solution {
+  private record WordPair(String former, String latter) {
+  }
+
+  public int ladderLength(String beginWord, String endWord, List<String> wordList) {
+    Map<WordPair, List<String>> patternToWords = buildPatternToWords(beginWord, wordList);
+
+    List<String> frontier = new ArrayList<>();
+    frontier.add(beginWord);
+    int numWords = 1;
+    Set<String> seen = new HashSet<>();
+    seen.add(beginWord);
+
+    while (!frontier.isEmpty()) {
+      List<String> nextFrontier = new ArrayList<>();
+
+      for (String word : frontier) {
+        if (word.equals(endWord)) {
+          return numWords;
+        }
+
+        for (WordPair pattern : patternsByWord(word)) {
+          List<String> nextWords = patternToWords.get(pattern);
+          List<String> nextWordsToBeSeen = nextWords.stream()
+              .filter(nextWord -> !seen.contains(nextWord))
+              .toList();
+          nextFrontier.addAll(nextWordsToBeSeen);
+          seen.addAll(nextWordsToBeSeen);
+        }
+      }
+
+      frontier = nextFrontier;
+      ++numWords;
+    }
+
+    return 0;
+  }
+
+  private List<WordPair> patternsByWord(String word) {
+    List<WordPair> result = new ArrayList<>();
+    for (int i = 0; i < word.length(); ++i) {
+      String former = word.substring(0, i);
+      String latter = word.substring(i + 1);
+      result.add(new WordPair(former, latter));
+    }
+    return result;
+  }
+
+  private Map<WordPair, List<String>> buildPatternToWords(String beginWord, List<String> wordList) {
+    Map<WordPair, List<String>> result = new HashMap<>();
+    List<String> allWords = new ArrayList<>(wordList);
+    allWords.add(beginWord);
+
+    for (String word : allWords) {
+      for (WordPair pattern : patternsByWord(word)) {
+        result.computeIfAbsent(pattern, _k -> new ArrayList<>())
+            .add(word);
+      }
+    }
+
+    return result;
+  }
+}
+```
+
+- ミスあり
+  - Map.computeIfAbsentの引数のラムダを、`() -> new ArrayList<>()`としてしまった
+    - 正しくは、`_k -> new ArrayList<>()`のようにkeyを引数に取る
+  - メソッドを忘れて、ドキュメントを引いてしまった
+    - Map.computeIfAbsent
+    - String.substring
+- かかった時間：37:12
+  - 初見で解いたときよりかかっている……
+  - 初見のときは、考える時間を書く前にしっかり取ったので、そのぶんはあるけれど、それにしてもちょっと残念
+  - 書きながら考えてしまい、うまく書けなかった感じがする
