@@ -56,7 +56,7 @@ class Solution {
   - 誤差には注意
   - 負荷が高く、それほど勧められる書き方ではなさそう
 
-- k=2ならフィボナッチ数
+- k=2ならフィボナッチ数（の2倍）
 
 - メモ化なしの再帰でも間に合ってしまうらしい
   - https://github.com/goto-untrapped/Arai60/pull/44/changes#r1703434310
