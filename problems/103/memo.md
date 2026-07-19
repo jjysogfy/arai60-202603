@@ -176,3 +176,49 @@ class Solution {
   }
 }
 ```
+
+
+# step 4
+時間を置いて解き直した。
+```java
+// step 4 その1
+class Solution {
+  public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+    if (root == null) {
+      return new ArrayList<>();
+    }
+
+    List<TreeNode> frontier = new ArrayList<>();
+    frontier.add(root);
+    List<List<Integer>> zigzagTraversal = new ArrayList<>();
+
+    while (!frontier.isEmpty()) {
+      List<TreeNode> nextFrontier = new ArrayList<>();
+
+      List<Integer> values = frontier.stream()
+          .map(node -> node.val)
+          .collect(Collectors.toCollection(ArrayList::new));
+      if (zigzagTraversal.size() % 2 != 0) {
+        Collections.reverse(values);
+      }
+
+      zigzagTraversal.add(values);
+
+      for (TreeNode node : frontier) {
+        if (node.left != null) {
+          nextFrontier.add(node.left);
+        }
+        if (node.right != null) {
+          nextFrontier.add(node.right);
+        }
+      }
+
+      frontier = nextFrontier;
+    }
+
+    return zigzagTraversal;
+  }
+}
+```
+
+- かかった時間：7:58
