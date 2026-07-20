@@ -2,13 +2,14 @@
 https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/
 
 # step 1
-
+- （step 1 をやってから1ヶ月以上経ってしまった）
 - 40分ぐらい
   - 問題は前に見て考えていた
   - スマホで書いていた
     - 前半20分は調べごとをしていた（スマホでの書き方など）ので、実際に書いたのは20分ぐらい
 
 ```java
+// step 1 のコード
 class Solution {
   public TreeNode buildTree(int[] preorder, int[] inorder) {
     return buildTreeFromLists(
@@ -29,6 +30,7 @@ class Solution {
     return new TreeNode(rootVal, left, right);
   }
 }
+// step 1 のコード 終わり
 ```
 
 - 方針
@@ -51,8 +53,9 @@ Javaでたくさん解いている方。
     - `rootIndex--`もわかりづらいと感じる。基本的に進めるだけだが、時々つじつま合わせのために戻す、みたいに感じる
   - https://github.com/goto-untrapped/Arai60/blob/10206faf2ef26abf2cf23f23599753c08cbcba3e/105.%20Construct%20Binary%20Tree%20from%20Preorder%20and%20Inorder%20Traversal/ConstructBinaryTreeFromPreorderAndInorderTraversalStep1.java
 - 再帰呼び出しで、配列をコピーしても間に合う
-  - どのみちList.indexOfしているので、時間計算量は同じ（`O(n^2)`）
   - （subListはビューを作るだけ）
+  - どのみちList.indexOfしているので、時間計算量は同じ（`O(n^2)`）
+    - （ちなみに、ArraysにはindexOfのようなメソッドがない）
   - Solution2_1 https://github.com/goto-untrapped/Arai60/blob/10206faf2ef26abf2cf23f23599753c08cbcba3e/105.%20Construct%20Binary%20Tree%20from%20Preorder%20and%20Inorder%20Traversal/ConstructBinaryTreeFromPreorderAndInorderTraversalStep2.java
 - `Map<Integer, Integer> valToInorderIndex`を作っておけば時間計算量が削減できる
   - `O(n^2)`から`O(n)`になる
@@ -96,6 +99,10 @@ class Solution {
 // step 2 その1 終わり
 // かかった時間：13:37
 ```
+
+- Javaのよくある環境だと、再帰回数は1万回程度
+- それを踏まえると、時間計算量改善の意味はやや薄めかも
+  - LeetCodeでは 39ms → 2ms となった
 
 次は、スタックとループで書いてみる。
 ついでに、preorderBegin（以下のコードではi）はスタックに載せずに持つことにしてみる。
@@ -188,4 +195,44 @@ class Solution {
 
 
 ## step 2.3 清書
+重くなりすぎないように、step 1の方法で清書することにした。
 
+```java
+// step 2.3 清書
+class Solution {
+  public TreeNode buildTree(int[] preorder, int[] inorder) {
+    return buildTree(
+        Arrays.stream(preorder).boxed().toList(),
+        Arrays.stream(inorder).boxed().toList());
+  }
+
+  private TreeNode buildTree(List<Integer> preorder, List<Integer> inorder) {
+    if (preorder.isEmpty()) {
+      return null;
+    }
+
+    int value = preorder.get(0);
+    TreeNode node = new TreeNode(value);
+
+    int sizeOfLeft = inorder.indexOf(value);
+    node.left = buildTree(
+        preorder.subList(1, sizeOfLeft + 1),
+        inorder.subList(0, sizeOfLeft));
+    node.right = buildTree(
+        preorder.subList(sizeOfLeft + 1, preorder.size()),
+        inorder.subList(sizeOfLeft + 1, inorder.size()));
+    return node;
+  }
+}
+// step 2.3 清書 終わり
+```
+
+- 配列版とリスト版は良く似たメソッドなので、こうしてオーバーロードしてもいいかと思った
+- そういった名前の変更や、改行の追加など以外は、step 1と同じ
+
+
+# step 3
+1回目（ミスあり）：6:21、2回目：4:43、
+
+- 起こしたミス
+  - リストではなく配列で書き、メソッドを間違えた
