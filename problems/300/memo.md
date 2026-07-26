@@ -45,16 +45,61 @@ Javaでたくさん解いている方。
 - https://github.com/ryoooooory/LeetCode/pull/34
 
 気づいたこと
-- `O(N log N)`の方法がある
-  - 読んだことをもとに考えてみる。どうやっていたら思いつけそうか？
-  - step 1での記号を使う：
-    - `lengths[i]`は、ちょうど`nums[i]`で終わるLISの長さ
-  - `TreeMap` `numToLength`を作って、`lengths[i + 1]`を高速に計算したい
-  - `numToLength.get(num)`が、num以下に収まるLISの長さ、となるように更新していきたい
-  - すべての`num`をkeyに持つのは無駄なので、`nums[0], .., nums[i]`だけ
-  - 安直な考えで、次のような更新方法を考えた
-  - 例：
-    - numsが100, 400, 200, 300とする
-    - numToLengthは、`{100: 1}` -> `{100: 1, 400: 2}` ->
-      - -> `{100: 1, 200: 2, 400: 2}` -> `{100: 1, 200: 2, 300: 3, 400: 2}`となる？？
+## step 2.1 `O(N log N)`の方法
+`O(N log N)`の方法について、読んだことをもとに、自分でも考えてみる
+- https://github.com/ryoooooory/LeetCode/pull/34#discussion_r2133973501
+- `lengths[i + 1]`を高速に計算するにはどうするか
+  - `lengths`はstep 1の記号：`lengths[i]`は、`nums[i]`で終わるLISの長さ
+- `nums[i + 1]`の具体的な値は重要ではなく、`nums[0], .., nums[i]`との関係だけが大事
+- とくに、`nums[i + 1]`より真に小さいnumsのうち一番大きいものが大事（`nums[k]`とおく）
+- 次のようなTreeMap `numToLength`を考える
+  - `numToLength.lowerEntry(num).getValue()`は、num以下の数からなるLISの長さ
+- 例：
+  - numsが100, 400, 200, 300とする
+  - numToLengthは次のように遷移する
+    - `{100: 1}` ->
+    - `{100: 1, 400: 2}` ->
+    - `{100: 1, 200: 2}` ->
+    - `{100: 1, 200: 2, 300: 3}`
+  - 安直には次のようにやりそうになってしまうが、不都合
+    - `{100: 1}` ->
+    - `{100: 1, 400: 2}` ->
+    - `{100: 1, 200: 2, 400: 2}` ->
+    - `{100: 1, 200: 2, 300: 3, 400: 2}`
+    - 更新時に、適宜removeする必要がある
+
+```java
+// step 2.1 その1
+class Solution {
+  public int lengthOfLIS(int[] nums) {
+    // numToLength.lowerEntry(num).getValue() == num以下に収まるLISの長さ
+    NavigableMap<Integer, Integer> numToLength = new TreeMap<>();
+
+    for (int num : nums) {
+      Map.Entry<Integer, Integer> lower = numToLength.lowerEntry(num);
+      int newLength = lower == null ? 1 : lower.getValue() + 1;
+
+      NavigableMap<Integer, Integer> tail = numToLength.tailMap(num, true);
+      Iterator<Integer> iter = tail.values().iterator();
+      while (iter.hasNext()) {
+        int length = iter.next();
+        if (length > newLength) {
+          break;
+        }
+        iter.remove();
+      }
+
+      numToLength.put(num, newLength);
+    }
+
+    return numToLength
+        .sequencedValues()
+        .getLast();
+  }
+}
+```
+
+- 実際には、`iter`でループを回す必要はない
+  - ループは高々1回しか回らない
+- 
 
