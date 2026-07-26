@@ -209,4 +209,8 @@ class Solution {
 
 
 # step 3
+1回目（ミスあり）：12:54
+
+- 生じたミス
+  - スペルミス（lognest）
 
