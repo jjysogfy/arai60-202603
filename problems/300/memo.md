@@ -85,7 +85,7 @@ class Solution {
 
 考えたことのメモ：
 - `lengths[i + 1]`を高速に計算するにはどうするか
-  - `lengths`はstep 1の記号：`lengths[i]`は、`nums[i]`で終わるLISの長さ
+  - `lengths`はstep 1の記号（`lengths[i]`は、`nums[i]`で終わるLISの長さ）
 - `nums[i + 1]`の具体的な値は重要ではなく、`nums[0], .., nums[i]`との関係だけが大事
 - とくに、`nums[i + 1]`より真に小さいnumsのうち一番大きいものが大事（`nums[k]`とおく）
 - 次のようなTreeMap `numToLength`を考える
@@ -113,14 +113,13 @@ class Solution {
 - ループを書くとして、Iteratorはあまり読みやすくない気がするが **他の方法を思いつかない**
 - numToLengthのvalueは1つずつ増える
   - ここまでくると、`{1: 100, 2: 200, 3: 300}`のように逆向きの対応をさせればいい、と思いつくかもしれない
-    - 清書はその方法でやる
-- 変数名newLengthはあまりわかりやすくない気がする
+- 変数名newLengthはあまり **わかりやすくない** 気がする
   - 単にlengthでいいかな、でも+1したことは変数名に入れておきたい、ぐらいの気持ち
 
 Iteratorのループは高々1回しか回らないことを使った書き換えをしておく。
 
 ```java
-// step 2.1 その1の書き換え
+// step 2.1 その1' （「その1」の書き換え）
 class Solution {
   public int lengthOfLIS(int[] nums) {
     // numToLength.lowerEntry(num).getValue() == num以下に収まるLISの長さ
@@ -143,14 +142,13 @@ class Solution {
         .getLast();
   }
 }
+// step 2.1 その1' 終わり
 ```
 
-
-## step 2.2 清書
-LISの末尾の数のうち最小のもの、を管理する方法で書く。
+「逆向きの対応」を使ってみる。つまり、LISの末尾の数のうち最小のもの、を管理する方法で書く。
 
 ```java
-// step 2.2 清書
+// step 2.1 その2
 class Solution {
   public int lengthOfLIS(int[] nums) {
     // lengthToLastNum.get(length - 1): 長さlengthのLISの末尾のうち、最小のもの
@@ -172,9 +170,42 @@ class Solution {
     return lengthToLastNum.size();
   }
 }
+// step 2.1 その2 終わり
 ```
 
 - 20分ぐらいで書いた
+- `lengthToLastNum`は1はじまりではなく0はじまり
+  - `lengthToLastNum.get(length - 1)`と-1が必要
+  - 頭が混乱した
+  - 初めは1はじまりにしようとしたが、0番目をどう扱うか困ってやめてしまった
+    - `Arrays`なら、1はじまりも書きやすそう。清書はそうしてみる。
+- 二分探索も自分で書くと良さそうだが、すでに時間がかかっているので、今回はやめる
+- JavaのbinarySearchの返り値はわかりづらい
+  - https://docs.oracle.com/javase/jp/25/docs/api/java.base/java/util/Collections.html#binarySearch(java.util.List,T)
+
+
+## step 2.2 清書
+「step 2.1 その2」の方針。LISの末尾のうち最小のものを管理する方法。
+
+```java
+// step 2.2 清書
+class Solution {
+  public int lengthOfLIS(int[] nums) {
+    int[] lengthToLastNum = new int[nums.length + 1];
+    int longest = 0;
+
+    for (int num : nums) {
+      int length = Arrays.binarySearch(lengthToLastNum, 1, longest + 1, num);
+      length = length >= 0 ? length : -(length + 1);
+
+      longest = Math.max(longest, length);
+      lengthToLastNum[length] = num;
+    }
+
+    return longest;
+  }
+}
+```
 
 
 # step 3
