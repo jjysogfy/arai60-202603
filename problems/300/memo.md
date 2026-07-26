@@ -1,4 +1,5 @@
-問題：300. Longest Increasing Subsequence https://leetcode.com/problems/longest-increasing-subsequence/
+問題：300. Longest Increasing Subsequence
+https://leetcode.com/problems/longest-increasing-subsequence/
 
 # step 1
 ```java
@@ -33,10 +34,21 @@ class Solution {
   - 時間計算量`O(N^2)`、`N <= 2500`なので、実行時間は60ms--600ms程度と見積もる
     - 41msだった。合っている
   - ソートと二分探索とかで高速化できたはず、となんとなく覚えている
-    - `nums[0], .., nums[i]`がkeyで、`lengths`がvalueの`SortedMap`を作る
-    - `nums[i + 1]`の挿入位置を見ると`lengths[i + 1]`が計算できる
+    - `nums[0], .., nums[i]`がkeyで、`lengths`がvalueの`TreeMap`を作る
+    - `TreeMap`への`nums[i + 1]`の挿入位置を見ると`lengths[i + 1]`が計算できる
+    - 追記：これ、よく考えると微妙だ
+      - keyが大きくなるごとにlengthは小さくなるべき
+      - `nums[i + 1]`を挿入するときに注意がいる
+      - それを踏まえると次の方法が自然に出てくる気がする
   - しばらく考えて思い出したけど、次の方法が有名だったはず
     - `lengthToLast[l]`を長さlのLISの末尾に現れる数で最小のものとする
     - numsを前から見てlengthToLastを更新する
-- ところで、どんな`nums`のせいでこういうアルゴリズムが必要になるのか、わかっていないと気づく
+    - 自分じゃ時間内にゼロから思いつくのは無理かな、と思ってしまう
+- （ところで、どんな`nums`のせいでこういうアルゴリズムが必要になるのか、わかっていないと気づく）
+
+
+# step 2
+Javaでたくさん解いている方。
+- https://github.com/goto-untrapped/Arai60/pull/18
+- https://github.com/ryoooooory/LeetCode/pull/34
 
